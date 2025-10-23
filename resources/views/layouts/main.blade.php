@@ -198,13 +198,10 @@
                     <h5 class="text-uppercase fw-bold mb-4">Kontak Kami</h5>
                     <p>
                         <i class="bi bi-geo-alt-fill me-2"></i>
-                        {{-- dari homecontroller --}}
-                        {{-- Ganti yang asli --}}
                         Jl. Raya Perning No. 358, Kec. Jetis, Kabupaten Mojokerto, Jawa Timur
                     </p>
                     <p>
                         <i class="bi bi-telephone-fill me-2"></i>
-                        {{-- dari homecontroller --}}
                         0856-5507-8878 - Fenny
                     </p>
                 </div>
@@ -212,7 +209,6 @@
                 <div class="col-md-4 col-lg-3 mx-auto mb-md-0 mb-4">
                     <h5 class="text-uppercase fw-bold mb-4">Jam Buka</h5>
                     <p>
-                        {{-- GANTI INI DENGAN DATA ASLI --}}
                         <i class="bi bi-clock-fill me-2"></i>
                         Senin - Minggu : 08.00 - 17.00
                 </div>
@@ -220,7 +216,7 @@
             </div>
         </div>
 
-        <div class="text-center p-3 mt-4" style="background-color: rgba(0, 0, 0, 0.2);">
+        <div class="text-center p-3 mt-4">
             &copy; 2025 Toko Wilujeng. All Rights Reserved.
         </div>
     </footer>

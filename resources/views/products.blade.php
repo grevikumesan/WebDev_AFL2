@@ -9,6 +9,27 @@
         Daftar Produk Kami
     </h1>
 
+    <!-- Search Bar -->
+    <div class="row justify-content-center mt-4 pb-5">
+        <div class="col-md-8">
+            <form action="/products" method="GET" class="d-flex bg-white shadow-lg rounded-pill p-2"
+                    autocomplete="off"> {{-- hilangin riwayat input --}}
+                <input
+                    type="text"
+                    name="search"
+                    class="form-control border-0 rounded-pill px-3 shadow-none"
+                    placeholder="🔍 Cari produk... contoh: gula, rokok, sabun"
+                    style="font-size: 1.05rem; background-color: transparent; outline: none;"
+                    autocomplete="off" {{-- hilangin riwayat input --}}
+                >
+                <button class="btn btn-soft-green rounded-pill px-4 fw-semibold shadow-none border-0" type="submit"
+                        style="background-color: #81c784; color: white;">
+                    Cari
+                </button>
+            </form>
+        </div>
+    </div>
+
     @if($products->count() > 0)
         <div class="row">
             @foreach($products as $product)

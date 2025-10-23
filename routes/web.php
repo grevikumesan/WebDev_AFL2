@@ -12,6 +12,8 @@ use App\Http\Controllers\ProductController;
 Route::get('/', [HomeController::class, 'index']);
 Route::get('/about', [HomeController::class, 'about']);
 Route::get('/contact', [HomeController::class, 'contact']);
+Route::get('/cart', [HomeController::class, 'cart']);
+Route::get('/wishlist', [HomeController::class, 'wishlist']);
 
 // Product routes
 Route::get('/products', [ProductController::class, 'index']);

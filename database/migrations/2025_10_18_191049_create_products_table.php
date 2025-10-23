@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedInteger('price');
             $table->string('unit')->nullable();
             $table->string('image')->nullable();
+            $table->unsignedInteger('stock')->default(0);
             $table->timestamps();
         });
     }

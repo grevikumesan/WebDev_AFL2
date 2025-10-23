@@ -1,8 +1,6 @@
 @extends('layouts.main')
 
-@section('title')
-    {{ $title }}
-@endsection
+@section('title', 'Home')
 
 @section('main_content')
     <section class="text-center py-5 shadow-sm"
@@ -22,7 +20,7 @@
                             type="text"
                             name="search"
                             class="form-control border-0 rounded-pill px-3 shadow-none"
-                            placeholder="🔍 Cari produk... contoh: gula, rokok, sabun..."
+                            placeholder="🔍 Cari produk... contoh: gula, rokok, sabun"
                             style="font-size: 1.05rem; background-color: transparent; outline: none;"
                             autocomplete="off" {{-- hilangin riwayat input --}}
                         >

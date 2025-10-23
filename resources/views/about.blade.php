@@ -1,14 +1,12 @@
 @extends('layouts.main')
 
-@section('title')
-    {{ $title }} {{-- dari controller --}}
-@endsection
+@section('title', 'Tentang Kami')
 
 @section('main_content')
     <!-- Title-->
     <section class="py-5 text-center bg-light shadow-sm mb-5">
         <div class="container">
-            <h1 class="display-5 fw-bold text-success mb-3">{{ $title }}</h1>
+            <h1 class="display-5 fw-bold text-success mb-3">"Tentang Kami</h1>
             <p class="lead text-muted">Tempat Anda mendapatkan kebutuhan pokok berkualitas sejak 2010</p>
         </div>
     </section>
@@ -25,7 +23,10 @@
                 <div class="card border-0 shadow-sm p-4 bg-white rounded-4">
                     <h3 class="fw-bold text-success mb-3">Siapa Kami?</h3>
                     <p class="text-muted" style="text-align: justify;">
-                        {{ $description }} {{-- dari controller --}}
+                        Toko Wilujeng adalah toko sembako yang berlokasi di Jln. Raya Perning,
+                        Kabupaten Mojokerto yang telah menjadi pilihan utama masyarakat sekitar
+                        dalam memenuhi kebutuhan pokok sehari-hari. Toko Wilujeng menyediakan
+                        berbagai produk sembako seperti gula, tepung, rokok, dan masih banyak lagi.
                     </p>
 
                     <h4 class="fw-bold text-success mt-4">Visi Kami</h4>
