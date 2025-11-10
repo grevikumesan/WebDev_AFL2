@@ -49,7 +49,7 @@
                     </svg>
                     </a>
                 </li>
-                
+
                 <li class="nav-item mx-lg-2">
                     <a class="nav-link {{ request()->is('cart') ? 'active' : '' }}"
                        href="/cart">
@@ -58,6 +58,39 @@
                         </svg>
                     </a>
                 </li>
+
+                @guest
+                    {{-- Jika user adalah GUEST (belum login), tampilkan ini --}}
+                    <li class="nav-item mx-lg-2">
+                        <a class="nav-link {{ request()->is('login') ? 'active' : '' }}"
+                        href="{{ route('login') }}">
+                            Login
+                        </a>
+                    </li>
+                    <li class="nav-item mx-lg-2">
+                        <a class="nav-link {{ request()->is('register') ? 'active' : '' }}"
+                        href="{{ route('register') }}">
+                            Register
+                        </a>
+                    </li>
+                @else
+                    {{-- Jika user SUDAH LOGIN, tampilkan ini --}}
+                    <li class="nav-item mx-lg-2">
+                        <a class="nav-link" href="#">
+                            Halo, {{ Auth::user()->name }}
+                        </a>
+                    </li>
+                    <li class="nav-item mx-lg-2">
+                        <a class="nav-link" href="{{ route('logout') }}"
+                        onclick="event.preventDefault();
+                                        document.getElementById('logout-form').submit();">
+                            Logout
+                        </a>
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                            @csrf
+                        </form>
+                    </li>
+                @endguest
 
             </ul>
         </div>

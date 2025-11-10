@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model {
+    
+    protected $fillable = ['name'];
+
     public function products() {
         // 'category_id' adalah foreign key di tabel products
         // 'id' adalah primary key di tabel categories

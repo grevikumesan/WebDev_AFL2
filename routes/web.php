@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
+use Illuminate\Support\Facades\Auth;
 
 
 //route yang memberi tahu Laravel
@@ -18,3 +19,5 @@ Route::get('/wishlist', [HomeController::class, 'wishlist']);
 // Product routes
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/product/{id}', [ProductController::class, 'show']);
+
+Auth::routes();
