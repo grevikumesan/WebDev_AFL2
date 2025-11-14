@@ -13,15 +13,14 @@
     <div class="row justify-content-center mt-4 pb-5">
         <div class="col-md-8">
             <form action="/products" method="GET" class="d-flex bg-white shadow-lg rounded-pill p-2"
-                    autocomplete="off"> {{-- hilangin riwayat input --}}
+                    autocomplete="off">
                 <input
                     type="text"
                     name="search"
                     class="form-control border-0 rounded-pill px-3 shadow-none"
                     placeholder="🔍 Cari produk... contoh: gula, rokok, sabun"
                     style="font-size: 1.05rem; background-color: transparent; outline: none;"
-                    autocomplete="off" {{-- hilangin riwayat input --}}
-                >
+                    autocomplete="off">
                 <button class="btn btn-soft-green rounded-pill px-4 fw-semibold shadow-none border-0" type="submit"
                         style="background-color: #81c784; color: white;">
                     Cari
@@ -65,18 +64,24 @@
 
                             <h5 class="card-title fw-semibold">{{ $product->name }}</h5>
                             <p class="fw-bold fs-5" style="color:#3b7d5e;">
-                                {{-- num formatter --}}
                                 Rp {{ number_format($product->price, 0, ',', '.') }}
                                 @if($product->unit)
                                     / {{ $product->unit }}
                                 @endif
                             </p>
 
+                            <!-- TOMBOL DETAIL -->
                             <a href="/product/{{ $product->id }}"
-                               class="btn w-100"
+                               class="btn w-50 mx-auto"
                                style="background-color:#bcead5; color:#2d5a3a; border:none; font-weight:500; border-radius:10px; transition:all 0.3s;">
                                 Lihat Detail
                             </a>
+
+                            <!-- icon hati buat wishlist -->
+                           <button class="btn border-0 p-0 wishlist-btn position-absolute" 
+                                    style="bottom: 20px; right: 17px;">
+                                <i class="bi bi-heart fs-3"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -100,3 +105,20 @@
         </div>
     @endif
 @endsection
+
+<!-- biar hatinya dari kosong bisa ada warna dan sebaliknya -->
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+    document.querySelectorAll('.wishlist-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const icon = this.querySelector('i');
+
+            icon.classList.toggle('bi-heart');
+            icon.classList.toggle('bi-heart-fill');
+            icon.classList.toggle('text-danger');
+        });
+    });
+});
+</script>
+@endpush
