@@ -150,13 +150,12 @@
 
 <!-- Guest Restriction Modal -->
 <div class="modal fade" id="guestRestrictionModal" tabindex="-1" 
-     data-bs-backdrop="false" data-bs-keyboard="true"
-     aria-labelledby="guestRestrictionModalLabel" aria-hidden="true">
+         data-bs-backdrop="false" data-bs-keyboard="true"
+         aria-labelledby="guestRestrictionModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content" style="border-radius: 16px; overflow: hidden;">
                 <div class="modal-header text-center" style="background:#bcead5; color:#2d5a3a; border-bottom: none;">
                     <h5 class="modal-title w-100 fw-bold" id="guestRestrictionModalLabel">
-                        <i class="fas fa-lock me-2"></i>
                         Toko Wilujeng
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -178,7 +177,6 @@
                     <div class="d-grid gap-2 mb-3">
                         <a href="{{ route('login') }}" class="btn py-3 fw-semibold login-redirect-btn"
                            style="background-color: #2d5a3a; color: white; border-radius: 12px; font-size: 1.1rem;">
-                            <i class="fas fa-sign-in-alt me-2"></i>
                             Masuk ke Akun
                         </a>
                     </div>
@@ -323,9 +321,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // ====================================================================
     // 2. Tombol Tambah ke Keranjang (Cart Icon) Logic & Restriction
-    // ====================================================================
     document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
         const cardBody = btn.closest('.card-body');
         const cartBoxWrapper = cardBody.querySelector('.cart-box-wrapper');
