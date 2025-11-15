@@ -22,7 +22,7 @@ class ProductController extends Controller {
             });
         }
 
-        $products = $query->get();
+        $products = $query->paginate(15);
 
         return view('products', [
             'title' => 'Daftar Produk',
@@ -30,9 +30,8 @@ class ProductController extends Controller {
         ]);
     }
 
-    public function show($id) {
-        // nampilin produk berdasarkan id data dan kategorinya
-        $product = Product::with('category')->find($id);
+    public function show(Product $product) {
+        $product->load('category'); 
         return view('product-detail', [
             'title' => 'Detail Produk',
             'product' => $product

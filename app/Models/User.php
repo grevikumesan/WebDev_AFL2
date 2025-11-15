@@ -21,6 +21,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'image',
+        'role'
     ];
 
     /**
@@ -38,11 +40,14 @@ class User extends Authenticatable
      *
      * @return array<string, string>
      */
-    protected function casts(): array
-    {
+    protected function casts(): array {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function wishlistProducts() {
+        return $this->belongsToMany(Product::class, 'product_user_wishlist');
     }
 }
