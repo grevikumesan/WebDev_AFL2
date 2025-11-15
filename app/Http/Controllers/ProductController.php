@@ -30,9 +30,8 @@ class ProductController extends Controller {
         ]);
     }
 
-    public function show($id) {
-        // nampilin produk berdasarkan id data dan kategorinya
-        $product = Product::with('category')->findOrFail($id);
+    public function show(Product $product) {
+        $product->load('category'); 
         return view('product-detail', [
             'title' => 'Detail Produk',
             'product' => $product

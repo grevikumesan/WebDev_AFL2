@@ -78,7 +78,7 @@
                             </a>
 
                             <!-- icon hati buat wishlist -->
-                           <button class="btn border-0 p-0 wishlist-btn position-absolute" 
+                           <button class="btn border-0 p-0 wishlist-btn position-absolute"
                                     style="bottom: 20px; right: 17px;">
                                 <i class="bi bi-heart fs-3"></i>
                             </button>
@@ -86,6 +86,7 @@
                     </div>
                 </div>
             @endforeach
+            {{ $products->links() }}
         </div>
     @else
         <div class="row">
