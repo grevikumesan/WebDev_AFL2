@@ -44,6 +44,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/wishlist', [HomeController::class, 'wishlist'])->name('wishlist.index');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/cart/add', [HomeController::class, 'addToCart'])->name('cart.add');
 
     // Nanti taruh rute 'profile', 'checkout', 'tambah ke cart' di sini
 
