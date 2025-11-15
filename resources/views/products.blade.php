@@ -32,6 +32,7 @@
     @if($products->count() > 0)
         <div class="row">
             @foreach($products as $product)
+            
                 <div class="col-md-4 mb-4">
                     <div class="card h-100 border-0 shadow-sm"
                         style="background-color:#ffffff; border-radius:16px; overflow:hidden;">
@@ -70,6 +71,12 @@
                                 @endif
                             </p>
 
+                            <p class="mb-3" style="color:#2d5a3a; font-weight:600;">
+                                Stok: {{ $product->stock }}
+                            </p>
+
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+
                             <!-- TOMBOL DETAIL -->
                             <a href="/product/{{ $product->id }}"
                                class="btn w-50 mx-auto"
@@ -77,9 +84,22 @@
                                 Lihat Detail
                             </a>
 
+                            <!-- TAMBAH KE KERANJANG -->
+                            <form action="/cart/add" method="POST" style="width:48%;">
+                                @csrf
+                                <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                <button type="submit"
+                                        class="btn"
+                                        style="background-color:#bcead5; color:#2d5a3a; border:none;
+                                            font-weight:500; border-radius:10px; width:80%;">
+                                    + Keranjang
+                                </button>
+                            </form>
+                        </div>
+
                             <!-- icon hati buat wishlist -->
                            <button class="btn border-0 p-0 wishlist-btn position-absolute" 
-                                    style="bottom: 20px; right: 17px;">
+                                    style="bottom: 12px; right: 17px;">
                                 <i class="bi bi-heart fs-3"></i>
                             </button>
                         </div>
