@@ -20,7 +20,7 @@
                         {{-- EMAIL --}}
                         <div class="mb-3">
                             <label for="email" class="form-label fw-semibold" style="color:#335b48;">
-                                Email Address
+                                Alamat Email
                             </label>
                             <input id="email" type="email"
                                    class="form-control shadow-none @error('email') is-invalid @enderror"
@@ -37,10 +37,12 @@
                                 Password
                             </label>
 
-                            <input id="password" type="password"
-                                   class="form-control shadow-none @error('password') is-invalid @enderror"
-                                   name="password" required>
-
+                            <div class="input-group">
+                                <input id="password" type="password"
+                                       class="form-control shadow-none @error('password') is-invalid @enderror"
+                                       name="password" required>
+                                
+                            </div>
                             @error('password')
                                 <span class="invalid-feedback"><strong>{{ $message }}</strong></span>
                             @enderror
@@ -51,7 +53,7 @@
                             <input class="form-check-input" type="checkbox" id="remember" name="remember"
                                    {{ old('remember') ? 'checked' : '' }}>
                             <label class="form-check-label" for="remember" style="color:#3b7d5e;">
-                                Remember Me
+                                Ingat Saya
                             </label>
                         </div>
 
@@ -68,14 +70,40 @@
                                 <a href="{{ route('password.request') }}"
                                    class="text-decoration-none"
                                    style="color:#3b7d5e; font-weight:500;">
-                                    Forgot Password?
+                                    Lupa Password?
                                 </a>
                             @endif
                         </div>
                     </form>
+
+                    {{-- REGISTRATION LINK --}}
+                    <div class="text-center mt-4 pt-3" style="border-top: 1px solid #dee2e6;">
+                        <p class="mb-0" style="color:#3b7d5e;">
+                            Tidak punya akun?
+                            <a href="{{ route('register') }}" class="text-decoration-none fw-semibold" style="color:#2d5a3a;">
+                                Registrasi di sini
+                            </a>
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const togglePassword = document.getElementById('togglePassword');
+        const password = document.getElementById('password');
+        const passwordIcon = document.getElementById('passwordIcon');
+        
+        togglePassword.addEventListener('click', function() {
+            // Toggle the type attribute
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            
+            
+        });
+    });
+</script>
 @endsection
