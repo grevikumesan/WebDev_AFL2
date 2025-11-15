@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CartController; // <-- DITAMBAHKAN: Diperlukan untuk rute cart.add
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ProfileController;
@@ -41,6 +42,10 @@ Auth::routes();
 Route::middleware(['auth'])->group(function () {
 
     Route::get('/cart', [HomeController::class, 'cart'])->name('cart.index');
+    
+    // RUTE BARU DITAMBAHKAN: Untuk memproses form 'Tambah ke Keranjang'
+    Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add'); 
+
     Route::get('/wishlist', [HomeController::class, 'wishlist'])->name('wishlist.index');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
