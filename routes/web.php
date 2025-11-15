@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\CartController; // <-- DITAMBAHKAN: Diperlukan untuk rute cart.add
+use App\Http\Controllers\CartController; // untuk rute cart.add
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ProfileController;
@@ -37,13 +37,12 @@ Auth::routes();
 
 
 // --- GRUP 3: RUTE CUSTOMER (WAJIB LOGIN) ---
-// "Satpam" 'auth' bawaan Laravel akan ngejaga grup ini.
 // Rute /cart dan /wishlist dipindah ke sini biar aman.
 Route::middleware(['auth'])->group(function () {
 
     Route::get('/cart', [HomeController::class, 'cart'])->name('cart.index');
     
-    // RUTE BARU DITAMBAHKAN: Untuk memproses form 'Tambah ke Keranjang'
+    // Untuk memproses form 'Tambah ke Keranjang'
     Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add'); 
 
     Route::get('/wishlist', [HomeController::class, 'wishlist'])->name('wishlist.index');
@@ -56,13 +55,10 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // --- GRUP 4: RUTE ADMIN (WAJIB LOGIN & ROLE ADMIN) ---
-// Ini grup paling aman, dijaga 2 "Satpam": 'auth' dan 'admin'
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
 
     // Rute buat CRUD User (admin.users.index, admin.users.create, dll)
     Route::resource('users', UserController::class);
 
-    // Nanti tambahin rute dashboard admin, dll di sini
-    // Contoh: Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
 });
