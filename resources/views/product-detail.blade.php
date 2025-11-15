@@ -39,7 +39,7 @@
                 <div class="mt-4">
 
                     {{-- QUANTITY (+/-) --}}
-                    <div class="mb-3 text-start" style="max-width:150px;">
+                    <div class="mb-3 text-start" style="max-width:130px;">
                         <label class="fw-bold mb-1" style="color:#2e5947;">Jumlah:</label>
 
                         <div class="d-flex align-items-center"
@@ -124,7 +124,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', (event) => {
     document.querySelectorAll('.wishlist-btn').forEach(btn => {
-        // Asumsi icon awal adalah bi-heart (kosong)
+        // biar icon hatinya kosong
         btn.innerHTML = '<i class="bi bi-heart"></i>';
 
         btn.addEventListener('click', function () {
