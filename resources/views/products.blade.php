@@ -9,11 +9,11 @@
         Daftar Produk Kami
     </h1>
 
-    <!-- Search Bar -->
+    {{-- Search Bar --}}
     <div class="row justify-content-center mt-4 pb-5">
         <div class="col-md-8">
             <form action="/products" method="GET" class="d-flex bg-white shadow-lg rounded-pill p-2"
-                    autocomplete="off">
+                  autocomplete="off">
                 <input
                     type="text"
                     name="search"
@@ -28,7 +28,7 @@
             </form>
         </div>
     </div>
-
+    
     @if($products->count() > 0)
         <div class="row">
             @foreach($products as $product)
@@ -37,7 +37,7 @@
                     <div class="card h-100 border-0 shadow-sm"
                         style="background-color:#ffffff; border-radius:16px; overflow:hidden;">
 
-                        <!-- Wrapper gambar agar ga nge-zoom -->
+                        {{-- Wrapper Gambar --}}
                         <div style="
                             width:100%;
                             height:250px;
@@ -50,11 +50,11 @@
                             <img src="{{ asset('images/' . $product->image) }}"
                                  alt="{{ $product->name }}"
                                  style="
-                                    max-width:100%;
-                                    max-height:100%;
-                                    object-fit:contain;
-                                    border-top-left-radius:16px;
-                                    border-top-right-radius:16px;">
+                                     max-width:100%;
+                                     max-height:100%;
+                                     object-fit:contain;
+                                     border-top-left-radius:16px;
+                                     border-top-right-radius:16px;">
                         </div>
 
                         <div class="card-body" style="color:#335b48;">
@@ -75,33 +75,30 @@
                                 Stok: {{ $product->stock }}
                             </p>
 
-                            <div class="d-flex justify-content-between align-items-center mt-3">
+                            
+                            <div class="d-flex justify-content-start **align-items-end** gap-3 mt-3">
 
-                            <!-- TOMBOL DETAIL -->
-                            <a href="/product/{{ $product->id }}"
-                               class="btn w-50 mx-auto"
-                               style="background-color:#bcead5; color:#2d5a3a; border:none; font-weight:500; border-radius:10px; transition:all 0.3s;">
-                                Lihat Detail
-                            </a>
+                                <a href="/product/{{ $product->id }}"
+                                   class="btn flex-grow-1"
+                                   style="background-color:#eafaf1; color:#2d5a3a; border:1px solid #bcead5; font-weight:500; border-radius:10px; transition:all 0.3s;">
+                                    Detail
+                                </a>
 
-                            <!-- TAMBAH KE KERANJANG -->
-                            <form action="/cart/add" method="POST" style="width:48%;">
-                                @csrf
-                                <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                <button type="submit"
-                                        class="btn"
-                                        style="background-color:#bcead5; color:#2d5a3a; border:none;
-                                            font-weight:500; border-radius:10px; width:80%;">
-                                    + Keranjang
+                                <div class="d-inline-block">
+                                    <button type="button"
+                                            class="p-0 border-0 add-to-cart-btn" 
+                                            data-product-id="{{ $product->id }}"
+                                            data-product-name="{{ $product->name }}" {{-- Ditambahkan untuk modal --}}
+                                            style="background:none; color:#2d5a3a; **cursor:default;**">
+                                        <i class="bi bi-cart-plus-fill fs-3"></i>
+                                    </button>
+                                </div>
+                                
+                                <button class="p-0 border-0 wishlist-btn" 
+                                        style="background:none; color:#3b7d5e; **cursor:default;**">
+                                     <i class="bi bi-heart fs-3"></i>
                                 </button>
-                            </form>
-                        </div>
-
-                            <!-- icon hati buat wishlist -->
-                           <button class="btn border-0 p-0 wishlist-btn position-absolute" 
-                                    style="bottom: 12px; right: 17px;">
-                                <i class="bi bi-heart fs-3"></i>
-                            </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -124,9 +121,21 @@
             </div>
         </div>
     @endif
+
+    {{-- KERANJANG --}}
+    <div class="modal fade" id="cartSuccessModal" tabindex="-1" aria-labelledby="cartSuccessModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color:#eafaf1; border-bottom:1px solid #bcead5;">
+                    <h5 class="modal-title fw-bold text-success" id="cartSuccessModalLabel">
+                        <i class="bi bi-check-circle-fill me-2"></i>Berhasil!
+                    </h5>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
-<!-- biar hatinya dari kosong bisa ada warna dan sebaliknya -->
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', (event) => {
@@ -134,9 +143,17 @@ document.addEventListener('DOMContentLoaded', (event) => {
         btn.addEventListener('click', function () {
             const icon = this.querySelector('i');
 
+            // Toggle antara ikon kosong dan isi
             icon.classList.toggle('bi-heart');
             icon.classList.toggle('bi-heart-fill');
-            icon.classList.toggle('text-danger');
+            
+            // buat warna icon hati
+            if (icon.classList.contains('bi-heart-fill')) {
+                icon.classList.add('text-danger'); 
+            } else {
+                icon.classList.remove('text-danger');
+                icon.style.color = '#3b7d5e';
+            }
         });
     });
 });
