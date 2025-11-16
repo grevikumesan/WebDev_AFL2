@@ -224,6 +224,11 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Buat cek status login
+        window.IS_LOGGED_IN = {{ auth()->check() ? 'true' : 'false' }};
+        window.LOGIN_URL = "{{ route('login') }}";
+    </script>
     @stack('scripts')
 </body>
 </html>
