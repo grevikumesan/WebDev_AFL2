@@ -32,20 +32,14 @@
     @if($products->count() > 0)
         <div class="row">
             @foreach($products as $product)
-                <div class="col-md-4 mb-4">
+                <div class="col-6 col-sm-6 col-md-4 mb-4">
                     <div class="card h-100 border-0 shadow-sm"
                         style="background-color:#ffffff; border-radius:16px; overflow:hidden;">
 
                         {{-- Wrapper Gambar --}}
-                        <div style="
-                            width:100%;
-                            height:250px;
-                            display:flex;
-                            align-items:center;
-                            justify-content:center;
-                            background-color:#f7faf9;
-                            border-top-left-radius:16px;
-                            border-top-right-radius:16px;">
+                        <div class="product-image-wrapper" 
+     style="width:100%; height:250px; display:flex; align-items:center; justify-content:center; background-color:#f7faf9; border-top-left-radius:16px; border-top-right-radius:16px;">
+
                             <img src="{{ asset('images/' . $product->image) }}"
                                  alt="{{ $product->name }}"
                                  style="
@@ -74,7 +68,7 @@
                                 Stok: {{ $product->stock }}
                             </p>
 
-                            {{-- BOX INTERAKTIF (KUANTITAS) --}}
+                            {{-- KUANTITAS & KERANJANG --}}
                             <div class="cart-box-wrapper mb-2" style="display:none;">
                                 <div class="p-3 border rounded shadow-sm bg-light cart-box">
                                     <h6 class="fw-bold mb-2 cart-product-name" style="color:#2d5a3a;">
@@ -94,7 +88,6 @@
                                 </div>
                             </div>
 
-                            {{-- KELOMPOK TOMBOL AKSI --}}
                             <div class="d-flex justify-content-start align-items-end gap-3 mt-3">
                                 {{-- Lihat Detail --}}
                                 <a href="{{ route('products.show', $product->id) }}"
@@ -203,7 +196,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // Global variables untuk menyimpan intended action
     let intendedAction = {
         type: '', // 'wishlist' atau 'cart'
         productId: null,
@@ -211,7 +203,6 @@ document.addEventListener('DOMContentLoaded', () => {
         callback: null
     };
 
-    // Helper function untuk Guest Restriction dengan Modal
     const showGuestRestrictionModal = (actionType, productId = null, productName = '', callback = null) => {
         // Simpan intended action
         intendedAction.type = actionType;
@@ -271,15 +262,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Initialize redirect buttons
+    // Inisialisasi redirect buttons
     setupRedirectButtons();
 
-    // Check intended action on page load (setelah kembali dari login/register)
+    // Check intended setelah kembali dari login/register
     checkIntendedAction();
 
-    // ====================================================================
     // 1. Wishlist (Love Icon) Logic & Restriction
-    // ====================================================================
     document.querySelectorAll('.wishlist-btn').forEach(btn => {
         btn.addEventListener('click', function (e) {
             const actionName = this.getAttribute('data-action-name');
@@ -419,4 +408,76 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 </script>
+@endpush
+
+@push('styles')
+<style>
+/* ===== SMALLER CARD ON MOBILE ===== */
+@media (max-width: 576px) {
+
+    /* Gambar produk lebih kecil */
+    .product-image-wrapper {
+        height: 130px !important;
+        padding: 4px !important;
+    }
+
+    .product-image-wrapper img {
+        max-height: 100px !important;
+        object-fit: contain !important;
+    }
+
+    /* Card lebih kecil */
+    .card {
+        border-radius: 12px !important;
+    }
+
+    .card-body {
+        padding: 10px !important;
+    }
+
+    /* Judul & harga kecil */
+    .card-title {
+        font-size: 0.9rem !important;
+    }
+    .card-body p,
+    .card-body span {
+        font-size: 0.8rem !important;
+    }
+
+    .fs-5 {
+        font-size: 1rem !important;
+    }
+
+    /* Badge kategori kecil */
+    .badge {
+        font-size: 0.7rem !important;
+        padding: 3px 7px !important;
+    }
+
+    /* Tombol kecil */
+    .btn {
+        font-size: 0.75rem !important;
+        padding: 6px 8px !important;
+    }
+
+    /* Icon lebih kecil */
+    .bi-heart, .bi-heart-fill, .bi-cart-plus-fill {
+        font-size: 1.2rem !important;
+    }
+
+    /* Cart box kecil */
+    .cart-box {
+        padding: 8px !important;
+    }
+
+    .qty-input {
+        width: 35px !important;
+        font-size: 0.9rem !important;
+    }
+
+    .btn-increase, .btn-decrease {
+        font-size: 14px !important;
+    }
+}
+</style>
 @endpush
