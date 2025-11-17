@@ -14,16 +14,10 @@ class Admin
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next)
-    {
-        // Cek 2 hal:
-        // 1. Dia udah login BELUM?
-        // 2. Kalo udah login, role-nya 'admin' BUKAN?
+    public function handle(Request $request, Closure $next) {
         if (!Auth::check() || Auth::user()->role !== 'admin') {
-            // Kalo salah satu gagal, tendang dia
             abort(403, 'THIS ACTION IS UNAUTHORIZED.');
         }
-        // if admin, proceed
         return $next($request);
     }
 }

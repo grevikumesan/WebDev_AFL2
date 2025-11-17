@@ -13,20 +13,20 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        User::truncate(); //hapus data lama agar tidak duplikat jika di seed lagi
+        User::truncate();
 
         $usersData = [
             [
                 'name' => 'Admin',
                 'email' => 'admin@gmail.com',
-                'password' => 'password',
+                'password' => '12345678',
                 'image' => null,
                 'role' => 'admin'
             ],
             [
                 'name' => 'Customer',
                 'email' => 'customer@gmail.com',
-                'password' => 'password',
+                'password' => '12345678',
                 'image' => null,
                 'role' => 'customer'
             ],

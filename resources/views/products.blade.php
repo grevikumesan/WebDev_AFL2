@@ -28,7 +28,7 @@
             </form>
         </div>
     </div>
-    
+
     @if($products->count() > 0)
         <div class="row">
             @foreach($products as $product)
@@ -36,7 +36,7 @@
                     <div class="card h-100 border-0 shadow-sm"
                         style="background-color:#ffffff; border-radius:16px; overflow:hidden;">
                         {{-- Wrapper Gambar --}}
-                        <div class="product-image-wrapper" 
+                        <div class="product-image-wrapper"
      style="width:100%; height:250px; display:flex; align-items:center; justify-content:center; background-color:#f7faf9; border-top-left-radius:16px; border-top-right-radius:16px;">
 
                             <img src="{{ asset('images/' . $product->image) }}"
@@ -98,7 +98,7 @@
                                 {{-- Tombol Tambah ke Keranjang (Harus Login) --}}
                                 <div class="d-inline-block">
                                     <button type="button"
-                                            class="p-0 border-0 add-to-cart-btn" 
+                                            class="p-0 border-0 add-to-cart-btn"
                                             data-action-name="keranjang"
                                             data-product-id="{{ $product->id }}"
                                             data-product-name="{{ $product->name }}"
@@ -109,7 +109,7 @@
                                 </div>
 
                                 {{-- Tombol Wishlist (Harus Login) --}}
-                                <button class="p-0 border-0 wishlist-btn" 
+                                <button class="p-0 border-0 wishlist-btn"
                                         data-action-name="wishlist"
                                         data-product-id="{{ $product->id }}"
                                         style="background:none; color:#3b7d5e; cursor:pointer;">
@@ -141,7 +141,7 @@
     @endif
 
 <!-- Guest Restriction Modal -->
-<div class="modal fade" id="guestRestrictionModal" tabindex="-1" 
+<div class="modal fade" id="guestRestrictionModal" tabindex="-1"
          data-bs-backdrop="true" data-bs-keyboard="true"
          aria-labelledby="guestRestrictionModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -172,7 +172,7 @@
                             Masuk ke Akun
                         </a>
                     </div>
-                    
+
                     <div class="text-center">
                         <p class="text-muted mb-2" style="font-size: 0.9rem;">Belum punya akun?</p>
                         <a href="{{ route('register') }}" class="text-decoration-none fw-semibold register-redirect-btn"
@@ -358,11 +358,11 @@
     h1.text-center {
         font-size: 1rem !important;
     }
-    
+
     .card-title {
         font-size: 0.7rem !important;
     }
-    
+
     .btn.flex-grow-1 {
         font-size: 0.6rem !important;
     }
@@ -370,217 +370,102 @@
 </style>
 @endpush
 
+{{-- Taruh ini di paling bawah file, sebelum @endsection --}}
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    let intendedAction = {
-        type: '', // 'wishlist' atau 'cart'
-        productId: null,
-        productName: '',
-        callback: null
-    };
+    document.addEventListener('DOMContentLoaded', function() {
 
-    const showGuestRestrictionModal = (actionType, productId = null, productName = '', callback = null) => {
-        // Simpan intended action
-        intendedAction.type = actionType;
-        intendedAction.productId = productId;
-        intendedAction.productName = productName;
-        intendedAction.callback = callback;
+        // Cek status login dari PHP ke JS
+        const isLoggedIn = @json(auth()->check());
 
-        // Update pesan modal berdasarkan action type
-        const actionText = actionType === 'wishlist' ? 'menyimpan ke wishlist' : 'menambahkan ke keranjang belanja';
-        document.getElementById('modalActionMessage').textContent = 
-            `Untuk ${actionText}, silakan masuk ke akun Anda atau daftar baru.`;
+        // Siapin modal
+        const guestModalElement = document.getElementById('guestRestrictionModal');
+        const guestModal = new bootstrap.Modal(guestModalElement);
+        const modalMessage = document.getElementById('modalActionMessage');
 
-        // Tampilkan modal
-        const guestModal = new bootstrap.Modal(document.getElementById('guestRestrictionModal'));
-        guestModal.show();
-    };
-
-    // Setup redirect buttons dengan intended action
-    const setupRedirectButtons = () => {
-        const loginBtn = document.querySelector('.login-redirect-btn');
-        const registerBtn = document.querySelector('.register-redirect-btn');
-
-        if (loginBtn) {
-            // Simpan intended action di sessionStorage sebelum redirect
-            loginBtn.addEventListener('click', function(e) {
-                if (intendedAction.type) {
-                    sessionStorage.setItem('intendedAction', JSON.stringify(intendedAction));
-                }
-            });
-        }
-
-        if (registerBtn) {
-            // Simpan intended action di sessionStorage sebelum redirect
-            registerBtn.addEventListener('click', function(e) {
-                if (intendedAction.type) {
-                    sessionStorage.setItem('intendedAction', JSON.stringify(intendedAction));
-                }
-            });
-        }
-    };
-
-    // Check jika ada intended action setelah login/register
-    const checkIntendedAction = () => {
-        const savedAction = sessionStorage.getItem('intendedAction');
-        if (savedAction) {
-            const action = JSON.parse(savedAction);
-            
-            // Execute callback jika ada setelah user login/register
-            if (action.callback && typeof action.callback === 'function') {
-                setTimeout(() => {
-                    action.callback();
-                }, 500);
-            }
-            
-            // Clear saved action
-            sessionStorage.removeItem('intendedAction');
-        }
-    };
-
-    // Inisialisasi redirect buttons
-    setupRedirectButtons();
-
-    // Check intended setelah kembali dari login/register
-    checkIntendedAction();
-
-    // Wishlist (Love Icon) Logic & Restriction
-    document.querySelectorAll('.wishlist-btn').forEach(btn => {
-        btn.addEventListener('click', function (e) {
-            const actionName = this.getAttribute('data-action-name');
-            const productId = this.getAttribute('data-product-id');
-
-            // --- GUEST RESTRICTION ---
-            if (!window.IS_LOGGED_IN) {
+        // 1. Logika Tombol Wishlist
+        document.querySelectorAll('.wishlist-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
                 e.preventDefault();
-                
-                // Callback untuk setelah login/register
-                const afterLoginCallback = () => {
-                    const icon = this.querySelector('i');
-                    icon.classList.toggle('bi-heart');
-                    icon.classList.toggle('bi-heart-fill');
-                    
-                    if (icon.classList.contains('bi-heart-fill')) {
-                        icon.style.color = '#dc3545';
-                        // AJAX call untuk add wishlist
-                        addToWishlist(productId);
+                const actionName = this.dataset.actionName; // "wishlist"
+
+                // KALO BELUM LOGIN: Tampilkan modal
+                if (!isLoggedIn) {
+                    modalMessage.textContent = 'Untuk menambahkan produk ke ' + actionName;
+                    guestModal.show();
+                    return; // Stop
+                }
+
+                // KALO SUDAH LOGIN: Kirim data (AJAX/Fetch)
+                const productId = this.dataset.productId;
+                const icon = this.querySelector('i');
+
+                fetch('{{ route('wishlist.store') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}' // Penting untuk keamanan
+                    },
+                    body: JSON.stringify({ product_id: productId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Ganti ikon jadi 'filled'
+                        icon.classList.remove('bi-heart');
+                        icon.classList.add('bi-heart-fill');
+                        button.disabled = true; // Biar nggak diklik lagi
                     }
-                };
-
-                showGuestRestrictionModal('wishlist', productId, '', afterLoginCallback);
-                return;
-            }
-            
-            // --- LOGGED-IN USER LOGIC ---
-            const icon = this.querySelector('i');
-            icon.classList.toggle('bi-heart');
-            icon.classList.toggle('bi-heart-fill');
-            
-            if (icon.classList.contains('bi-heart-fill')) {
-                icon.style.color = '#dc3545';
-                addToWishlist(productId);
-            } else {
-                icon.style.color = '#3b7d5e';
-                removeFromWishlist(productId);
-            }
-        });
-    });
-
-    // Tombol Tambah ke Keranjang (Cart Icon) Logic & Restriction
-    document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
-        const cardBody = btn.closest('.card-body');
-        const cartBoxWrapper = cardBody.querySelector('.cart-box-wrapper');
-        const btnAddCart = cartBoxWrapper.querySelector('.btn-add-cart');
-        const addedMsg = cartBoxWrapper.querySelector('.added-msg');
-        const maxStock = parseInt(btn.getAttribute('data-product-stock'));
-        const actionName = btn.getAttribute('data-action-name');
-        const productId = btn.getAttribute('data-product-id');
-        const productName = btn.getAttribute('data-product-name');
-
-        // Click pada Ikon Keranjang (Show/Hide Box)
-        btn.addEventListener('click', (e) => {
-            // --- GUEST RESTRICTION ---
-            if (!window.IS_LOGGED_IN) {
-                e.preventDefault();
-                
-                // Callback untuk setelah login/register
-                const afterLoginCallback = () => {
-                    // Tampilkan cart box setelah login
-                    cartBoxWrapper.style.display = 'block';
-                    initializeCartBox();
-                };
-
-                showGuestRestrictionModal('cart', productId, productName, afterLoginCallback);
-                return;
-            }
-            
-            // Toggle tampilan box
-            cartBoxWrapper.style.display = cartBoxWrapper.style.display === 'none' ? 'block' : 'none';
-            initializeCartBox();
-        });
-
-        // Function untuk initialize cart box
-        const initializeCartBox = () => {
-            const qtyInput = cartBoxWrapper.querySelector('.qty-input');
-            const btnIncrease = cartBoxWrapper.querySelector('.btn-increase');
-            const btnDecrease = cartBoxWrapper.querySelector('.btn-decrease');
-
-            // Reset state box
-            qtyInput.value = 1;
-            addedMsg.style.display = 'none';
-            btnAddCart.disabled = false;
-
-            // --- + / - tombol logika ---
-            btnIncrease.onclick = () => {
-                let val = parseInt(qtyInput.value);
-                if(val < maxStock) qtyInput.value = val + 1;
-                else alert(`Stok maksimal: ${maxStock}`);
-            };
-            btnDecrease.onclick = () => {
-                let val = parseInt(qtyInput.value);
-                if(val > 1) qtyInput.value = val - 1;
-            };
-        };
-
-        // Click pada Tombol 'Tambah ke Keranjang' di dalam Box
-        btnAddCart.addEventListener('click', () => {
-            const qtyInput = cartBoxWrapper.querySelector('.qty-input');
-            const quantity = parseInt(qtyInput.value);
-
-            // Fetch request ke rute cart.add
-            fetch("{{ route('cart.add') }}", {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ product_id: productId, quantity: quantity })
-            })
-            .then(res => res.json())
-            .then(data => {
-                // Tampilkan pesan sukses dan nonaktifkan tombol
-                addedMsg.style.display = 'block';
-                btnAddCart.disabled = true;
-                // Sembunyikan box setelah beberapa detik
-                setTimeout(() => cartBoxWrapper.style.display = 'none', 2000); 
-            })
-            .catch(err => {
-                alert('Terjadi kesalahan saat menambahkan ke keranjang. Coba lagi.');
-                console.error(err);
+                    // Tampilkan notifikasi (ganti 'alert' dengan 'toast' nanti)
+                    alert(data.message);
+                })
+                .catch(error => console.error('Error:', error));
             });
         });
+
+        // 2. Logika Tombol Keranjang
+        document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const actionName = this.dataset.actionName; // "keranjang"
+
+                // KALO BELUM LOGIN: Tampilkan modal
+                if (!isLoggedIn) {
+                    modalMessage.textContent = 'Untuk menambahkan produk ke ' + actionName;
+                    guestModal.show();
+                    return; // Stop
+                }
+
+                // KALO SUDAH LOGIN: Kirim data (AJAX/Fetch)
+                const productId = this.dataset.productId;
+                const icon = this.querySelector('i');
+
+                fetch('{{ route('cart.store') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        product_id: productId,
+                        quantity: 1  // Kirim quantity 1 sebagai default
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Ganti ikon jadi 'checked'
+                        icon.classList.remove('bi-cart-plus-fill');
+                        icon.classList.add('bi-cart-check-fill');
+                        button.disabled = true; // Biar nggak diklik lagi
+                    }
+                    // Tampilkan notifikasi (ganti 'alert' dengan 'toast' nanti)
+                    alert(data.message);
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+
     });
-
-    // Mock functions untuk wishlist
-    function addToWishlist(productId) {
-        console.log('Adding to wishlist:', productId);
-    }
-
-    function removeFromWishlist(productId) {
-        console.log('Removing from wishlist:', productId);
-    }
-});
 </script>
 @endpush

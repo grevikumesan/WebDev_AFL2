@@ -11,11 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('product_user_wishlist', function (Blueprint $table) {
+        Schema::create('carts', function (Blueprint $table) {
+            $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
-            $table->timestamp('created_at')->nullable();
-            $table->primary(['user_id', 'product_id']);
+            $table->unsignedInteger('quantity')->default(1);
+            $table->timestamps();
+
+            // Opsional: Bikin unique constraint biar 1 user nggak punya 2 baris untuk produk yg sama
+            $table->unique(['user_id', 'product_id']);
         });
     }
 
@@ -24,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('product_user_wishlist');
+        Schema::dropIfExists('carts');
     }
 };
