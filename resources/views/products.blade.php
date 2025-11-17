@@ -194,90 +194,91 @@
 <style>
     @media (max-width: 576px) {
 
-        h1 {
-            font-size: 1.5rem !important;
-        }
-
-        /* Search Bar */
-        input[name="search"] {
-            font-size: 0.9rem !important;
-        }
-
-        .btn-soft-green {
-            font-size: 0.85rem !important;
-            padding: 6px 14px !important;
-        }
-
-        /* Card Wrapper */
-        .card-body {
-            padding: 12px !important;
-        }
-
-        .card-title {
-            font-size: 1rem !important;
-        }
-
-        .card .fw-bold,
-        .card .fw-semibold,
-        .card p,
-        .card span,
-        .card h5 {
-            font-size: 0.9rem !important;
-        }
-
-        .card .badge {
-            font-size: 0.8rem !important;
-            padding: 4px 10px !important;
-        }
-
-        /* Harga */
-        .card .fs-5 {
-            font-size: 1rem !important;
-        }
-
-        /* Tombol Lihat Detail */
-        .card a.btn {
-            font-size: 0.85rem !important;
-            padding: 6px !important;
-        }
-
-        /* Ikon Keranjang & Wishlist */
-        .bi, .fas, .fa {
-            font-size: 1.3rem !important;
-        }
-
-        /* Cart box popup */
-        .cart-box {
-            padding: 12px !important;
-        }
-
-        .qty-input {
-            font-size: 0.9rem !important;
-            width: 40px !important;
-        }
-
-        .btn-add-cart {
-            font-size: 0.8rem !important;
-            padding: 6px !important;
-        }
-
-        .added-msg {
-            font-size: 0.8rem !important;
-        }
-
-        /* Modal Text */
-        #guestRestrictionModal h5 {
-            font-size: 1.1rem !important;
-        }
-
-        #guestRestrictionModal p {
-            font-size: 0.85rem !important;
-        }
-
-        .login-redirect-btn {
-            font-size: 1rem !important;
-        }
+    h1 {
+        font-size: 1.2rem !important;
     }
+
+    /* Search Bar */
+    input[name="search"] {
+        font-size: 0.75rem !important;
+        padding: 6px 10px !important;
+    }
+
+    .btn-soft-green {
+        font-size: 0.75rem !important;
+        padding: 4px 10px !important;
+    }
+
+    /* Card */
+    .card-body {
+        padding: 10px !important;
+    }
+
+    .card-title {
+        font-size: 0.85rem !important;
+    }
+
+    .card .fw-bold,
+    .card .fw-semibold,
+    .card p,
+    .card span,
+    .card h5 {
+        font-size: 0.75rem !important;
+    }
+
+    .card .badge {
+        font-size: 0.7rem !important;
+        padding: 3px 8px !important;
+    }
+
+    /* Harga */
+    .card .fs-5 {
+        font-size: 0.9rem !important;
+    }
+
+    /* Tombol Lihat Detail */
+    .card a.btn {
+        font-size: 0.75rem !important;
+        padding: 5px !important;
+    }
+
+    /* Ikon */
+    .bi, .fas, .fa {
+        font-size: 1.1rem !important;
+    }
+
+    /* Cart box */
+    .cart-box {
+        padding: 10px !important;
+    }
+
+    .qty-input {
+        font-size: 0.75rem !important;
+        width: 32px !important;
+    }
+
+    .btn-add-cart {
+        font-size: 0.75rem !important;
+        padding: 5px !important;
+    }
+
+    .added-msg {
+        font-size: 0.7rem !important;
+    }
+
+    /* Modal */
+    #guestRestrictionModal h5 {
+        font-size: 1rem !important;
+    }
+
+    #guestRestrictionModal p {
+        font-size: 0.75rem !important;
+    }
+
+    .login-redirect-btn {
+        font-size: 0.9rem !important;
+    }
+}
 </style>
 @endpush
 
