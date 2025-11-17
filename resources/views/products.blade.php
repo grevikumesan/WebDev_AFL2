@@ -32,10 +32,9 @@
     @if($products->count() > 0)
         <div class="row">
             @foreach($products as $product)
-                 <div class="col-4 mb-3">
+                 <div class="col-6 col-sm-4 col-md-3 mb-3">
                     <div class="card h-100 border-0 shadow-sm"
                         style="background-color:#ffffff; border-radius:16px; overflow:hidden;">
-
                         {{-- Wrapper Gambar --}}
                         <div class="product-image-wrapper" 
      style="width:100%; height:250px; display:flex; align-items:center; justify-content:center; background-color:#f7faf9; border-top-left-radius:16px; border-top-right-radius:16px;">
@@ -190,93 +189,182 @@
 @push('styles')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-
 <style>
-    @media (max-width: 576px) {
-
-    h1 {
-        font-size: 1.2rem !important;
+/* MOBILE VIEW FIX - Ukuran font lebih kecil */
+@media (max-width: 576px) {
+    /* Judul H1 */
+    h1.text-center {
+        font-size: 0.9rem !important;
+        margin-bottom: 1rem !important;
     }
 
-    /* Search Bar */
+    /* Search bar container */
+    .row.justify-content-center {
+        margin-top: 0.5rem !important;
+        padding-bottom: 1rem !important;
+    }
+
+    /* Search input */
     input[name="search"] {
-        font-size: 0.75rem !important;
-        padding: 6px 10px !important;
+        font-size: 0.65rem !important;
+        padding: 0.4rem 0.8rem !important;
     }
 
-    .btn-soft-green {
-        font-size: 0.75rem !important;
-        padding: 4px 10px !important;
+    /* Tombol Cari */
+    form button {
+        font-size: 0.65rem !important;
+        padding: 0.4rem 0.8rem !important;
     }
 
-    /* Card */
-    .card-body {
-        padding: 10px !important;
+    /* Card product */
+    .col-4 {
+        padding-left: 4px !important;
+        padding-right: 4px !important;
+        margin-bottom: 8px !important;
     }
 
+    /* Badge kategori */
+    .badge.rounded-pill {
+        font-size: 0.5rem !important;
+        padding: 0.2rem 0.4rem !important;
+        margin-bottom: 0.4rem !important;
+    }
+
+    /* Nama Produk */
     .card-title {
-        font-size: 0.85rem !important;
-    }
-
-    .card .fw-bold,
-    .card .fw-semibold,
-    .card p,
-    .card span,
-    .card h5 {
-        font-size: 0.75rem !important;
-    }
-
-    .card .badge {
-        font-size: 0.7rem !important;
-        padding: 3px 8px !important;
+        font-size: 0.5rem !important;
+        line-height: 1.2 !important;
+        margin-bottom: 0.3rem !important;
     }
 
     /* Harga */
-    .card .fs-5 {
-        font-size: 0.9rem !important;
+    .fw-bold.fs-5 {
+        font-size: 0.6rem !important;
+        margin-bottom: 0.3rem !important;
+    }
+
+    /* Stok */
+    .card-body p.mb-3 {
+        font-size: 0.5rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    /* Container tombol aksi */
+    .d-flex.justify-content-start {
+        margin-top: 0.5rem !important;
+        gap: 6px !important;
     }
 
     /* Tombol Lihat Detail */
-    .card a.btn {
-        font-size: 0.75rem !important;
-        padding: 5px !important;
+    .btn.flex-grow-1 {
+        font-size: 0.5rem !important;
+        padding: 0.2rem 0.3rem !important;
+        min-height: auto !important;
     }
 
-    /* Ikon */
-    .bi, .fas, .fa {
-        font-size: 1.1rem !important;
+    /* Icon keranjang dan wishlist */
+    .bi-cart-plus-fill.fs-3,
+    .bi-heart.fs-3 {
+        font-size: 0.8rem !important;
     }
 
-    /* Cart box */
+    /* Cart box wrapper */
+    .cart-box-wrapper {
+        margin-bottom: 0.3rem !important;
+    }
+
     .cart-box {
-        padding: 10px !important;
+        padding: 0.5rem !important;
+    }
+
+    .cart-product-name {
+        font-size: 0.55rem !important;
+        margin-bottom: 0.3rem !important;
     }
 
     .qty-input {
-        font-size: 0.75rem !important;
-        width: 32px !important;
+        font-size: 0.5rem !important;
+        width: 30px !important;
+    }
+
+    .btn-decrease,
+    .btn-increase {
+        font-size: 0.6rem !important;
     }
 
     .btn-add-cart {
-        font-size: 0.75rem !important;
-        padding: 5px !important;
+        font-size: 0.5rem !important;
+        padding: 0.2rem !important;
     }
 
     .added-msg {
+        font-size: 0.45rem !important;
+        margin-top: 0.3rem !important;
+    }
+
+    /* Alert produk tidak ditemukan */
+    .alert {
+        padding: 0.5rem !important;
+    }
+
+    .alert-heading {
         font-size: 0.7rem !important;
     }
 
-    /* Modal */
+    .alert p {
+        font-size: 0.6rem !important;
+        margin-bottom: 0.3rem !important;
+    }
+
+    .alert .btn {
+        font-size: 0.5rem !important;
+        padding: 0.2rem 0.4rem !important;
+    }
+
+    /* Modal styles untuk mobile */
+    #guestRestrictionModal .modal-title {
+        font-size: 0.8rem !important;
+    }
+
     #guestRestrictionModal h5 {
-        font-size: 1rem !important;
+        font-size: 0.7rem !important;
+        margin-bottom: 4px !important;
     }
 
     #guestRestrictionModal p {
-        font-size: 0.75rem !important;
+        font-size: 0.6rem !important;
+    }
+
+    #guestRestrictionModal .text-muted.small {
+        font-size: 0.55rem !important;
     }
 
     .login-redirect-btn {
-        font-size: 0.9rem !important;
+        font-size: 0.65rem !important;
+        padding: 0.4rem !important;
+    }
+
+    .register-redirect-btn {
+        font-size: 0.6rem !important;
+    }
+
+    .fa-users.fa-3x {
+        font-size: 2rem !important;
+    }
+}
+
+/* Untuk tablet kecil */
+@media (max-width: 768px) and (min-width: 577px) {
+    h1.text-center {
+        font-size: 1rem !important;
+    }
+    
+    .card-title {
+        font-size: 0.7rem !important;
+    }
+    
+    .btn.flex-grow-1 {
+        font-size: 0.6rem !important;
     }
 }
 </style>
