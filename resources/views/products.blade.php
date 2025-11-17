@@ -32,7 +32,7 @@
     @if($products->count() > 0)
         <div class="row">
             @foreach($products as $product)
-                <div class="col-6 col-sm-6 col-md-4 mb-4">
+                 <div class="col-4 mb-3">
                     <div class="card h-100 border-0 shadow-sm"
                         style="background-color:#ffffff; border-radius:16px; overflow:hidden;">
 
@@ -143,7 +143,7 @@
 
 <!-- Guest Restriction Modal -->
 <div class="modal fade" id="guestRestrictionModal" tabindex="-1" 
-         data-bs-backdrop="false" data-bs-keyboard="true"
+         data-bs-backdrop="true" data-bs-keyboard="true"
          aria-labelledby="guestRestrictionModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content" style="border-radius: 16px; overflow: hidden;">
@@ -268,7 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Check intended setelah kembali dari login/register
     checkIntendedAction();
 
-    // 1. Wishlist (Love Icon) Logic & Restriction
+    // Wishlist (Love Icon) Logic & Restriction
     document.querySelectorAll('.wishlist-btn').forEach(btn => {
         btn.addEventListener('click', function (e) {
             const actionName = this.getAttribute('data-action-name');
@@ -310,7 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 2. Tombol Tambah ke Keranjang (Cart Icon) Logic & Restriction
+    // Tombol Tambah ke Keranjang (Cart Icon) Logic & Restriction
     document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
         const cardBody = btn.closest('.card-body');
         const cartBoxWrapper = cardBody.querySelector('.cart-box-wrapper');
@@ -321,7 +321,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const productId = btn.getAttribute('data-product-id');
         const productName = btn.getAttribute('data-product-name');
 
-        // 2.1 Click pada Ikon Keranjang (Show/Hide Box)
+        // Click pada Ikon Keranjang (Show/Hide Box)
         btn.addEventListener('click', (e) => {
             // --- GUEST RESTRICTION ---
             if (!window.IS_LOGGED_IN) {
@@ -338,7 +338,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             
-            // --- LOGGED-IN USER LOGIC ---
             // Toggle tampilan box
             cartBoxWrapper.style.display = cartBoxWrapper.style.display === 'none' ? 'block' : 'none';
             initializeCartBox();
@@ -367,7 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         };
 
-        // 2.2 Click pada Tombol 'Tambah ke Keranjang' di dalam Box (AJAX POST)
+        // Click pada Tombol 'Tambah ke Keranjang' di dalam Box
         btnAddCart.addEventListener('click', () => {
             const qtyInput = cartBoxWrapper.querySelector('.qty-input');
             const quantity = parseInt(qtyInput.value);
@@ -399,12 +398,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Mock functions untuk wishlist
     function addToWishlist(productId) {
         console.log('Adding to wishlist:', productId);
-        // AJAX implementation here
     }
 
     function removeFromWishlist(productId) {
         console.log('Removing from wishlist:', productId);
-        // AJAX implementation here
     }
 });
 </script>
