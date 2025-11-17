@@ -9,7 +9,7 @@
         <h1 class="text-center mb-5 fw-bold text-success" style="color:#2d5a3a !important;">
             Detail Produk
         </h1>
-        
+
         <div class="row align-items-start py-4">
             {{-- KOLOM KIRI: GAMBAR --}}
             <div class="col-md-6 mb-4 text-center">
@@ -21,7 +21,7 @@
 
             {{-- KOLOM KANAN: DETAIL PRODUK --}}
             <div class="col-md-6" style="color:#335b48;">
-                
+
                 <span class="badge rounded-pill mb-3 px-3 py-2"
                       style="background-color:#bcead5; color:#2d5a3a; font-weight:500;">
                     {{ $product->category->name }}
@@ -29,15 +29,15 @@
 
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <h1 class="fw-bold mb-0" style="color:#2d5a3a;">{{ $product->name }}</h1>
-                    
+
                     {{-- IKON HATI (WISHLIST) --}}
                     <button class="btn wishlist-btn p-0 border-0"
                             data-product-id="{{ $product->id }}"
                             style="font-size: 2rem; color:#3b7d5e; background:none; line-height: 1;">
-                         <i class="bi bi-heart"></i> 
+                         <i class="bi bi-heart"></i>
                     </button>
                 </div>
-                
+
                 <p class="fw-bold fs-4" style="color:#3b7d5e;">
                     Rp {{ number_format($product->price, 0, ',', '.') }}
                     @if($product->unit)
@@ -46,12 +46,6 @@
                 </p>
                 <p class="fw-bold" style="color:#2e5947;">
                     Stok Tersedia: {{ $product->stock }}
-                </p>
-
-                <h5 class="fw-bold mt-4" style="color:#2e5947;">Deskripsi Produk:</h5>
-
-                <p class="mt-2" style="line-height:1.7; color:#3e6454;">
-                    {{ $product->description ?? 'Tidak ada deskripsi untuk produk ini.' }}
                 </p>
 
                 {{-- FORM QUANTITY + KERANJANG --}}
@@ -65,8 +59,8 @@
                         <div style="max-width:130px;">
                             <label for="qtyInput" class="fw-bold mb-1" style="color:#2e5947;">Jumlah:</label>
                             <div class="d-flex align-items-center"
-                                 style="background:#eafaf1; border:1px solid #bcead5; border-radius:10px; padding:6px 10px; height: 44px;"> 
-                                
+                                 style="background:#eafaf1; border:1px solid #bcead5; border-radius:10px; padding:6px 10px; height: 44px;">
+
                                 <button type="button" onclick="changeQty(-1)" style="background:none; border:none; font-size:20px; font-weight:bold; color:#2d5a3a;">-</button>
                                 <input id="qtyInput" name="quantity" type="text" value="1"
                                        class="form-control text-center mx-2"
@@ -94,7 +88,7 @@
     @endif
 
     <!-- Guest Restriction Modal -->
-    <div class="modal fade" id="guestRestrictionModal" tabindex="-1" 
+    <div class="modal fade" id="guestRestrictionModal" tabindex="-1"
          data-bs-backdrop="false" data-bs-keyboard="true"
          aria-labelledby="guestRestrictionModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -125,7 +119,7 @@
                             Masuk ke Akun
                         </a>
                     </div>
-                    
+
                     <div class="text-center">
                         <p class="text-muted mb-2" style="font-size: 0.9rem;">Belum punya akun?</p>
                         <a href="{{ route('register') }}" class="text-decoration-none fw-semibold register-redirect-btn"
@@ -162,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Update pesan modal berdasarkan action type
         const actionText = actionType === 'wishlist' ? 'menyimpan ke wishlist' : 'menambahkan ke keranjang belanja';
-        document.getElementById('modalActionMessage').textContent = 
+        document.getElementById('modalActionMessage').textContent =
             `Untuk ${actionText}, silakan masuk ke akun Anda atau daftar baru.`;
 
         // Tampilkan modal
@@ -199,14 +193,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const savedAction = sessionStorage.getItem('intendedAction');
         if (savedAction) {
             const action = JSON.parse(savedAction);
-            
+
             // Execute callback jika ada setelah user login/register
             if (action.callback && typeof action.callback === 'function') {
                 setTimeout(() => {
                     action.callback();
                 }, 500);
             }
-            
+
             // Clear saved action
             sessionStorage.removeItem('intendedAction');
         }
@@ -246,13 +240,13 @@ document.addEventListener('DOMContentLoaded', () => {
             // --- GUEST RESTRICTION ---
             if (!window.IS_LOGGED_IN) {
                 e.preventDefault();
-                
+
                 // Callback untuk setelah login/register
                 const afterLoginCallback = () => {
                     const icon = this.querySelector('i');
                     icon.classList.toggle('bi-heart');
                     icon.classList.toggle('bi-heart-fill');
-                    
+
                     if (icon.classList.contains('bi-heart-fill')) {
                         icon.style.color = '#dc3545';
                         addToWishlist(productId);
@@ -262,12 +256,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 showGuestRestrictionModal('wishlist', productId, '', afterLoginCallback);
                 return;
             }
-            
+
             // --- LOGGED-IN USER LOGIC ---
             const icon = this.querySelector('i');
             icon.classList.toggle('bi-heart');
             icon.classList.toggle('bi-heart-fill');
-            
+
             if (icon.classList.contains('bi-heart-fill')) {
                 icon.style.color = '#dc3545';
                 addToWishlist(productId);

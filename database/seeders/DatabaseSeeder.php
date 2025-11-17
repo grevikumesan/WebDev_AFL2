@@ -13,7 +13,7 @@ class DatabaseSeeder extends Seeder {
         $this->call([
             CategorySeeder::class, // jalan pertama
             ProductSeeder::class,  //kedua
-            // UserSeeder::class,  //kalo nanti mau bikin seeder user
+            UserSeeder::class,  //kalo nanti mau bikin seeder user
         ]);
 
         Schema::enableForeignKeyConstraints();
