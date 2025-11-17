@@ -32,7 +32,7 @@
     @if($products->count() > 0)
         <div class="row">
             @foreach($products as $product)
-                 <div class="col-6 col-sm-4 col-md-3 mb-3">
+                 <div class="col-4 mb-3">
                     <div class="card h-100 border-0 shadow-sm"
                         style="background-color:#ffffff; border-radius:16px; overflow:hidden;">
                         {{-- Wrapper Gambar --}}
