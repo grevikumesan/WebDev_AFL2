@@ -80,18 +80,16 @@
                         <input type="password" name="password_confirmation" class="form-control">
                     </div>
 
-                    <button type="submit" class="btn btn-success w-100 fw-bold">
+                    <button type="submit" class="btn btn-success w-100 fw-bold" style="background-color: #2d5a3a; border-color: #2d5a3a;">
                         Simpan Perubahan
                     </button>
                 </form>
 
+                {{-- Tombol Logout dengan Trigger Modal --}}
                 <div class="mt-3">
-                    <form action="{{ route('logout') }}" method="POST" onsubmit="return confirm('Yakin ingin logout?')">
-                        @csrf
-                        <button type="submit" class="btn btn-outline-danger w-100 fw-bold">
-                            Logout
-                        </button>
-                    </form>
+                    <button type="button" class="btn btn-outline-danger w-100 fw-bold" data-bs-toggle="modal" data-bs-target="#logoutModal">
+                        Logout
+                    </button>
                 </div>
 
             </div>
@@ -99,4 +97,83 @@
     </div>
 
 </div>
+
+<!-- Logout Confirmation Modal -->
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 16px; overflow: hidden;">
+            <div class="modal-header text-center" style="background:#bcead5; color:#2d5a3a; border-bottom: none;">
+                <h5 class="modal-title w-100 fw-bold" id="logoutModalLabel">
+                    Konfirmasi Logout
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <div class="mb-4">
+                    <div class="icon-wrapper mb-3">
+                        <i class="fas fa-sign-out-alt fa-3x" style="color: #2d5a3a;"></i>
+                    </div>
+                    <h5 style="color: #2d5a3a; margin-bottom: 8px;">Yakin ingin logout?</h5>
+                    <p class="text-muted" style="margin-bottom: 4px;">
+                        Anda akan keluar dari akun dan perlu login kembali untuk mengakses fitur.
+                    </p>
+                </div>
+
+                <div class="d-flex gap-3">
+                    <button type="button" class="btn btn-secondary flex-fill" data-bs-dismiss="modal" 
+                            style="border-radius: 12px; font-weight: 500;">
+                        Batal
+                    </button>
+                    <form action="{{ route('logout') }}" method="POST" class="flex-fill">
+                        @csrf
+                        <button type="submit" class="btn btn-danger w-100 fw-bold"
+                                style="background-color: #dc3545; border-color: #dc3545; border-radius: 12px;">
+                            Ya, Logout
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
+
+@push('styles')
+<style>
+/* Styling untuk modal logout */
+#logoutModal .modal-content {
+    border: 2px solid #bcead5;
+}
+
+#logoutModal .btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: white;
+}
+
+#logoutModal .btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+
+#logoutModal .btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+#logoutModal .btn-danger:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}
+
+/* Animasi untuk modal */
+.modal.fade .modal-dialog {
+    transform: scale(0.8);
+    transition: transform 0.3s ease-out;
+}
+
+.modal.show .modal-dialog {
+    transform: scale(1);
+}
+</style>
+@endpush
