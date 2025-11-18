@@ -72,7 +72,8 @@
                 @guest
                     <li class="nav-item mx-lg-2 d-none d-lg-block">
                         <a href="{{ route('login') }}" class="nav-link nav-item-custom">
-                            <img src="/images/foto.jpeg" alt="Profile" class="rounded-circle" style="width:36px; height:36px;">
+                            <img src="/images/foto.jpeg" 
+                                alt="Profile" class="rounded-circle" style="width:36px; height:36px;">
                         </a>
                     </li>
                 @endguest
@@ -80,7 +81,8 @@
                 @auth
                     <li class="nav-item mx-lg-2 d-none d-lg-block">
                         <a href="/profile" class="nav-link nav-item-custom">
-                            <img src="{{ Auth::user()->profile_photo_url ?? '/images/foto.jpeg' }}" alt="Profile" class="rounded-circle" style="width:36px; height:36px;">
+                            <img src="{{ Auth::user()->image ? asset('storage/' . Auth::user()->image) : '/images/foto.jpeg' }}" 
+                                alt="Profile" class="rounded-circle" style="width:36px; height:36px;">
                         </a>
                     </li>
                 @endauth
