@@ -32,7 +32,7 @@
     @if($products->count() > 0)
         <div class="row">
             @foreach($products as $product)
-                 <div class="col-4 mb-3">
+                 <div class="col-6 col-md-4 mb-3">
                     <div class="card h-100 border-0 shadow-sm"
                         style="background-color:#ffffff; border-radius:16px; overflow:hidden;">
                         {{-- Wrapper Gambar --}}
@@ -87,10 +87,10 @@
                                 </div>
                             </div>
 
-                            <div class="d-flex justify-content-start align-items-end gap-3 mt-3">
+                            <div class="d-flex justify-content-start align-items-center product-card-action gap-3 mt-3">
                                 {{-- Lihat Detail --}}
                                 <a href="{{ route('products.show', $product->id) }}"
-                                   class="btn flex-grow-1"
+                                   class="btn flex-grow-1 btn-detail"
                                    style="background-color:#eafaf1; color:#2d5a3a; border:1px solid #bcead5; font-weight:500; border-radius:10px; transition:all 0.3s;">
                                     Lihat Detail
                                 </a>
@@ -98,7 +98,7 @@
                                 {{-- Tombol Tambah ke Keranjang (Harus Login) --}}
                                 <div class="d-inline-block">
                                     <button type="button"
-                                            class="p-0 border-0 add-to-cart-btn"
+                                            class="p-0 border-0 add-to-cart-btn icon-btn"
                                             data-action-name="keranjang"
                                             data-product-id="{{ $product->id }}"
                                             data-product-name="{{ $product->name }}"
@@ -190,187 +190,29 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
 <style>
-/* MOBILE VIEW FIX - Ukuran font lebih kecil */
 @media (max-width: 576px) {
-    /* Judul H1 */
-    h1.text-center {
-        font-size: 0.9rem !important;
-        margin-bottom: 1rem !important;
+    .product-card-action .btn-detail {
+        font-size: 0.22rem !important;
+        padding: 0.06rem 0.12rem !important;
+        line-height: 0.6 !important;
+        border-radius: 3px !important;
     }
 
-    /* Search bar container */
-    .row.justify-content-center {
-        margin-top: 0.5rem !important;
-        padding-bottom: 1rem !important;
+    .add-to-cart-btn i {
+        font-size: 0.38rem !important;
     }
 
-    /* Search input */
-    input[name="search"] {
-        font-size: 0.65rem !important;
-        padding: 0.4rem 0.8rem !important;
-    }
-
-    /* Tombol Cari */
-    form button {
-        font-size: 0.65rem !important;
-        padding: 0.4rem 0.8rem !important;
-    }
-
-    /* Card product */
-    .col-4 {
-        padding-left: 4px !important;
-        padding-right: 4px !important;
-        margin-bottom: 8px !important;
-    }
-
-    /* Badge kategori */
-    .badge.rounded-pill {
-        font-size: 0.5rem !important;
-        padding: 0.2rem 0.4rem !important;
-        margin-bottom: 0.4rem !important;
-    }
-
-    /* Nama Produk */
-    .card-title {
-        font-size: 0.5rem !important;
-        line-height: 1.2 !important;
-        margin-bottom: 0.3rem !important;
-    }
-
-    /* Harga */
-    .fw-bold.fs-5 {
-        font-size: 0.6rem !important;
-        margin-bottom: 0.3rem !important;
-    }
-
-    /* Stok */
-    .card-body p.mb-3 {
-        font-size: 0.5rem !important;
-        margin-bottom: 0.5rem !important;
-    }
-
-    /* Container tombol aksi */
-    .d-flex.justify-content-start {
-        margin-top: 0.5rem !important;
-        gap: 6px !important;
-    }
-
-    /* Tombol Lihat Detail */
-    .btn.flex-grow-1 {
-        font-size: 0.5rem !important;
-        padding: 0.2rem 0.3rem !important;
-        min-height: auto !important;
-    }
-
-    /* Icon keranjang dan wishlist */
-    .bi-cart-plus-fill.fs-3,
-    .bi-heart.fs-3 {
-        font-size: 0.8rem !important;
-    }
-
-    /* Cart box wrapper */
-    .cart-box-wrapper {
-        margin-bottom: 0.3rem !important;
-    }
-
-    .cart-box {
-        padding: 0.5rem !important;
-    }
-
-    .cart-product-name {
-        font-size: 0.55rem !important;
-        margin-bottom: 0.3rem !important;
-    }
-
-    .qty-input {
-        font-size: 0.5rem !important;
-        width: 30px !important;
-    }
-
-    .btn-decrease,
-    .btn-increase {
-        font-size: 0.6rem !important;
-    }
-
-    .btn-add-cart {
-        font-size: 0.5rem !important;
-        padding: 0.2rem !important;
-    }
-
-    .added-msg {
-        font-size: 0.45rem !important;
-        margin-top: 0.3rem !important;
-    }
-
-    /* Alert produk tidak ditemukan */
-    .alert {
-        padding: 0.5rem !important;
-    }
-
-    .alert-heading {
-        font-size: 0.7rem !important;
-    }
-
-    .alert p {
-        font-size: 0.6rem !important;
-        margin-bottom: 0.3rem !important;
-    }
-
-    .alert .btn {
-        font-size: 0.5rem !important;
-        padding: 0.2rem 0.4rem !important;
-    }
-
-    /* Modal styles untuk mobile */
-    #guestRestrictionModal .modal-title {
-        font-size: 0.8rem !important;
-    }
-
-    #guestRestrictionModal h5 {
-        font-size: 0.7rem !important;
-        margin-bottom: 4px !important;
-    }
-
-    #guestRestrictionModal p {
-        font-size: 0.6rem !important;
-    }
-
-    #guestRestrictionModal .text-muted.small {
+    .wishlist-btn i {
         font-size: 0.55rem !important;
     }
 
-    .login-redirect-btn {
-        font-size: 0.65rem !important;
-        padding: 0.4rem !important;
-    }
-
-    .register-redirect-btn {
-        font-size: 0.6rem !important;
-    }
-
-    .fa-users.fa-3x {
-        font-size: 2rem !important;
-    }
-}
-
-/* Untuk tablet kecil */
-@media (max-width: 768px) and (min-width: 577px) {
-    h1.text-center {
-        font-size: 1rem !important;
-    }
-
-    .card-title {
-        font-size: 0.7rem !important;
-    }
-
-    .btn.flex-grow-1 {
-        font-size: 0.6rem !important;
+    .product-card-action {
+        gap: 1px !important;
     }
 }
 </style>
 @endpush
 
-{{-- Taruh ini di paling bawah file, sebelum @endsection --}}
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
