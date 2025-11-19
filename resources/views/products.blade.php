@@ -87,16 +87,17 @@
                                 </div>
                             </div>
 
-                            <div class="d-flex justify-content-start align-items-center product-card-action gap-3 mt-3">
+                            <div class="d-flex flex-column flex-sm-row justify-content-start align-items-center product-card-action gap-2 gap-sm-3 mt-3">
                                 {{-- Lihat Detail --}}
                                 <a href="{{ route('products.show', $product->id) }}"
-                                   class="btn flex-grow-1 btn-detail"
-                                   style="background-color:#eafaf1; color:#2d5a3a; border:1px solid #bcead5; font-weight:500; border-radius:10px; transition:all 0.3s;">
+                                class="btn btn-detail w-100 w-sm-auto flex-grow-1 flex-sm-grow-1"
+                                style="background-color:#eafaf1; color:#2d5a3a; border:1px solid #bcead5; font-weight:500; border-radius:10px; transition:all 0.3s;">
                                     Lihat Detail
                                 </a>
 
-                                {{-- Tombol Tambah ke Keranjang (Harus Login) --}}
-                                <div class="d-inline-block">
+                                {{-- Container untuk icon di mobile --}}
+                                <div class="d-flex d-sm-none justify-content-center w-100 gap-4 mobile-icons">
+                                    {{-- Tombol Tambah ke Keranjang --}}
                                     <button type="button"
                                             class="p-0 border-0 add-to-cart-btn icon-btn"
                                             data-action-name="keranjang"
@@ -106,17 +107,38 @@
                                             style="background:none; color:#2d5a3a; cursor:pointer;">
                                         <i class="bi bi-cart-plus-fill fs-3"></i>
                                     </button>
+
+                                    {{-- Tombol Wishlist --}}
+                                    <button class="p-0 border-0 wishlist-btn"
+                                            data-action-name="wishlist"
+                                            data-product-id="{{ $product->id }}"
+                                            style="background:none; color:#3b7d5e; cursor:pointer;">
+                                        <i class="bi bi-heart fs-3"></i>
+                                    </button>
                                 </div>
 
-                                {{-- Tombol Wishlist (Harus Login) --}}
-                                <button class="p-0 border-0 wishlist-btn"
-                                        data-action-name="wishlist"
-                                        data-product-id="{{ $product->id }}"
-                                        style="background:none; color:#3b7d5e; cursor:pointer;">
-                                     <i class="bi bi-heart fs-3"></i>
-                                </button>
-                            </div>
+                                {{-- Icon untuk desktop --}}
+                                <div class="d-none d-sm-flex align-items-center gap-3 desktop-icons">
+                                    {{-- Tombol Tambah ke Keranjang --}}
+                                    <button type="button"
+                                            class="p-0 border-0 add-to-cart-btn icon-btn"
+                                            data-action-name="keranjang"
+                                            data-product-id="{{ $product->id }}"
+                                            data-product-name="{{ $product->name }}"
+                                            data-product-stock="{{ $product->stock }}"
+                                            style="background:none; color:#2d5a3a; cursor:pointer;">
+                                        <i class="bi bi-cart-plus-fill fs-3"></i>
+                                    </button>
 
+                                    {{-- Tombol Wishlist --}}
+                                    <button class="p-0 border-0 wishlist-btn"
+                                            data-action-name="wishlist"
+                                            data-product-id="{{ $product->id }}"
+                                            style="background:none; color:#3b7d5e; cursor:pointer;">
+                                        <i class="bi bi-heart fs-3"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -187,27 +209,31 @@
 @endsection
 
 @push('styles')
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
 <style>
+/* Mobile View */
 @media (max-width: 576px) {
     .product-card-action .btn-detail {
-        font-size: 0.22rem !important;
-        padding: 0.06rem 0.12rem !important;
-        line-height: 0.6 !important;
-        border-radius: 3px !important;
-    }
-
-    .add-to-cart-btn i {
-        font-size: 0.38rem !important;
-    }
-
-    .wishlist-btn i {
         font-size: 0.55rem !important;
+        padding: 0.3rem 0.5rem !important;
+        line-height: 1.2 !important;
+        min-height: 28px;
     }
 
+    .mobile-icons .add-to-cart-btn i,
+    .mobile-icons .wishlist-btn i {
+        font-size: 1.1rem !important;
+    }
+}
+
+/* Desktop View */
+@media (min-width: 577px) {
     .product-card-action {
-        gap: 1px !important;
+        flex-direction: row !important;
+    }
+    
+    .desktop-icons .add-to-cart-btn i,
+    .desktop-icons .wishlist-btn i {
+        font-size: 1.3rem !important;
     }
 }
 </style>
