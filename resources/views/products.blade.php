@@ -230,7 +230,7 @@
     .product-card-action {
         flex-direction: row !important;
     }
-    
+
     .desktop-icons .add-to-cart-btn i,
     .desktop-icons .wishlist-btn i {
         font-size: 1.3rem !important;

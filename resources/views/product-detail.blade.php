@@ -49,7 +49,7 @@
                 </p>
 
                 {{-- FORM QUANTITY + KERANJANG --}}
-                <form action="{{ route('cart.add') }}" method="POST" class="mt-4" id="cartForm">
+                <form action="{{ route('cart.store') }}" method="POST" class="mt-4" id="cartForm">
                     @csrf
                     <input type="hidden" name="product_id" value="{{ $product->id }}">
 
@@ -137,68 +137,90 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+// ===== GLOBAL FUNCTION untuk Quantity (agar bisa diakses dari onclick) =====
+function changeQty(delta) {
+    const qtyInput = document.getElementById('qtyInput');
+    let currentQty = parseInt(qtyInput.value);
+    let maxStock = parseInt(qtyInput.dataset.maxStock || 999); // Baca dari data attribute
+
+    let newQty = currentQty + delta;
+
+    if (newQty < 1) {
+        newQty = 1;
+    }
+
+    if (newQty > maxStock) {
+        alert(`Maaf, stok maksimal hanya ${maxStock}.`);
+        newQty = maxStock;
+    }
+
+    qtyInput.value = newQty;
+}
+
+// Function untuk update quantity dengan tombol +/-
+function updateQuantity(itemId, delta, price) {
+    const qtyInput = document.getElementById(`qty-${itemId}`);
+    let currentQty = parseInt(qtyInput.value);
+    let newQty = currentQty + delta;
+
+    // Validasi minimum 1
+    if (newQty < 1) {
+        newQty = 1;
+    }
+
+    qtyInput.value = newQty;
+    updateSubtotal(itemId, price);
+}
+
+// Function untuk update subtotal display
+function updateSubtotal(itemId, price) {
+    const qtyInput = document.getElementById(`qty-${itemId}`);
+    const subtotalElement = document.getElementById(`subtotal-${itemId}`);
+
+    const quantity = parseInt(qtyInput.value) || 1;
+    const subtotal = price * quantity;
+
+    // Format rupiah
+    subtotalElement.textContent = 'Rp ' + subtotal.toLocaleString('id-ID');
+}
+
+// ===== KODE UTAMA (DOMContentLoaded) =====
 document.addEventListener('DOMContentLoaded', () => {
-    // Global variables untuk menyimpan intended action
-    let intendedAction = {
-        type: '', // 'wishlist' atau 'cart'
-        productId: null,
-        productName: '',
-        callback: null
-    };
 
-    // Helper function untuk Guest Restriction dengan Modal
-    const showGuestRestrictionModal = (actionType, productId = null, productName = '', callback = null) => {
-        // Simpan intended action
-        intendedAction.type = actionType;
-        intendedAction.productId = productId;
-        intendedAction.productName = productName;
-        intendedAction.callback = callback;
+    // --- GUEST RESTRICTION MODAL ---
+    const showGuestRestrictionModal = (actionType, productId = null) => {
+        const actionText = actionType === 'wishlist'
+            ? 'menyimpan ke wishlist'
+            : 'menambahkan ke keranjang belanja';
 
-        // Update pesan modal berdasarkan action type
-        const actionText = actionType === 'wishlist' ? 'menyimpan ke wishlist' : 'menambahkan ke keranjang belanja';
         document.getElementById('modalActionMessage').textContent =
             `Untuk ${actionText}, silakan masuk ke akun Anda atau daftar baru.`;
 
-        // Tampilkan modal
+        // Simpan intended action ke sessionStorage
+        sessionStorage.setItem('intendedAction', JSON.stringify({
+            type: actionType,
+            productId: productId,
+            timestamp: Date.now()
+        }));
+
         const guestModal = new bootstrap.Modal(document.getElementById('guestRestrictionModal'));
         guestModal.show();
     };
 
-    // Setup redirect buttons dengan intended action
-    const setupRedirectButtons = () => {
-        const loginBtn = document.querySelector('.login-redirect-btn');
-        const registerBtn = document.querySelector('.register-redirect-btn');
-
-        if (loginBtn) {
-            // Simpan intended action di sessionStorage sebelum redirect
-            loginBtn.addEventListener('click', function(e) {
-                if (intendedAction.type) {
-                    sessionStorage.setItem('intendedAction', JSON.stringify(intendedAction));
-                }
-            });
-        }
-
-        if (registerBtn) {
-            // Simpan intended action di sessionStorage sebelum redirect
-            registerBtn.addEventListener('click', function(e) {
-                if (intendedAction.type) {
-                    sessionStorage.setItem('intendedAction', JSON.stringify(intendedAction));
-                }
-            });
-        }
-    };
-
-    // Check jika ada intended action setelah login/register
+    // --- CHECK INTENDED ACTION (setelah login/register) ---
     const checkIntendedAction = () => {
         const savedAction = sessionStorage.getItem('intendedAction');
         if (savedAction) {
             const action = JSON.parse(savedAction);
 
-            // Execute callback jika ada setelah user login/register
-            if (action.callback && typeof action.callback === 'function') {
-                setTimeout(() => {
-                    action.callback();
-                }, 500);
+            // Execute action hanya jika user sudah login DAN belum expired (5 menit)
+            if (window.IS_LOGGED_IN && (Date.now() - action.timestamp < 300000)) {
+                if (action.type === 'wishlist') {
+                    addToWishlist(action.productId);
+                } else if (action.type === 'cart') {
+                    // Auto submit form jika action adalah cart
+                    document.getElementById('cartForm')?.submit();
+                }
             }
 
             // Clear saved action
@@ -206,93 +228,87 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Initialize redirect buttons
-    setupRedirectButtons();
-
-    // Check intended action on page load (setelah kembali dari login/register)
+    // Check intended action on page load
     checkIntendedAction();
 
-    // --- FUNGSI 1: MENGATUR KUANTITAS ---
-    function changeQty(delta) {
-        const qtyInput = document.getElementById('qtyInput');
-        let currentQty = parseInt(qtyInput.value);
-        let maxStock = parseInt("{{ $product->stock ?? 0 }}");
-
-        let newQty = currentQty + delta;
-
-        if (newQty < 1) {
-            newQty = 1;
-        }
-
-        if (newQty > maxStock) {
-            alert(`Maaf, stok maksimal hanya ${maxStock}.`);
-            newQty = maxStock;
-        }
-
-        qtyInput.value = newQty;
-    }
-
-    // --- FUNGSI 2: WISHLIST dengan Login Check ---
+    // --- WISHLIST HANDLER ---
     document.querySelectorAll('.wishlist-btn').forEach(btn => {
         btn.addEventListener('click', function (e) {
+            e.preventDefault();
             const productId = this.getAttribute('data-product-id');
 
-            // --- GUEST RESTRICTION ---
+            // Guest restriction
             if (!window.IS_LOGGED_IN) {
-                e.preventDefault();
-
-                // Callback untuk setelah login/register
-                const afterLoginCallback = () => {
-                    const icon = this.querySelector('i');
-                    icon.classList.toggle('bi-heart');
-                    icon.classList.toggle('bi-heart-fill');
-
-                    if (icon.classList.contains('bi-heart-fill')) {
-                        icon.style.color = '#dc3545';
-                        addToWishlist(productId);
-                    }
-                };
-
-                showGuestRestrictionModal('wishlist', productId, '', afterLoginCallback);
+                showGuestRestrictionModal('wishlist', productId);
                 return;
             }
 
-            // --- LOGGED-IN USER LOGIC ---
+            // Logged-in user logic
             const icon = this.querySelector('i');
+            const isFilled = icon.classList.contains('bi-heart-fill');
+
             icon.classList.toggle('bi-heart');
             icon.classList.toggle('bi-heart-fill');
 
-            if (icon.classList.contains('bi-heart-fill')) {
-                icon.style.color = '#dc3545';
-                addToWishlist(productId);
-            } else {
+            if (isFilled) {
                 icon.style.color = '#3b7d5e';
                 removeFromWishlist(productId);
+            } else {
+                icon.style.color = '#dc3545';
+                addToWishlist(productId);
             }
         });
     });
 
-    // --- FUNGSI 3: KERANJANG dengan Login Check ---
+    // --- CART FORM HANDLER ---
     const cartForm = document.getElementById('cartForm');
     if (cartForm) {
         cartForm.addEventListener('submit', function(e) {
-            // --- GUEST RESTRICTION ---
+            // Guest restriction
             if (!window.IS_LOGGED_IN) {
                 e.preventDefault();
-                showGuestRestrictionModal('cart', "{{ $product->id }}", "{{ $product->name }}");
+                const productId = cartForm.querySelector('input[name="product_id"]').value;
+                showGuestRestrictionModal('cart', productId);
             }
+            // Jika logged in, form akan submit normal
         });
     }
 
-    // Mock functions untuk wishlist
+    // --- WISHLIST AJAX FUNCTIONS ---
     function addToWishlist(productId) {
-        console.log('Adding to wishlist:', productId);
-        // AJAX implementation here
+        fetch(`/wishlist/${productId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Added to wishlist:', productId);
+                // Bisa tambahkan toast notification di sini
+            }
+        })
+        .catch(error => console.error('Error:', error));
     }
 
     function removeFromWishlist(productId) {
-        console.log('Removing from wishlist:', productId);
-        // AJAX implementation here
+        fetch(`/wishlist/${productId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Removed from wishlist:', productId);
+                // Bisa tambahkan toast notification di sini
+            }
+        })
+        .catch(error => console.error('Error:', error));
     }
 });
 </script>

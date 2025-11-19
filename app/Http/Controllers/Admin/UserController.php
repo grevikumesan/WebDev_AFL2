@@ -28,7 +28,7 @@ class UserController extends Controller
             'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
         ]);
 
-        $validatedData['password'] = $validatedData['password'];
+        $validatedData['password'] = $request->password;
 
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('user-images', 'public');
