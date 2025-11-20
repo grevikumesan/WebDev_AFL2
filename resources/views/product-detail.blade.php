@@ -70,7 +70,7 @@
                             </div>
                         </div>
 
-                        {{-- Tombol Tambah Keranjang (Submit Form) --}}
+                        {{-- Tombol Tambah Keranjang --}}
                         <button type="submit" class="btn btn-lg flex-grow-1"
                                  style="background-color:#bcead5; color:#2d5a3a; font-weight:600; border:none; border-radius:10px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; gap:8px;">
                             <i class="bi bi-cart-plus-fill"></i> Tambah ke Keranjang
@@ -87,7 +87,7 @@
         </div>
     @endif
 
-    <!-- Guest Restriction Modal -->
+    <!-- Tampilin pop up kalo masih jadi guest -->
     <div class="modal fade" id="guestRestrictionModal" tabindex="-1"
          data-bs-backdrop="false" data-bs-keyboard="true"
          aria-labelledby="guestRestrictionModalLabel" aria-hidden="true">
@@ -133,12 +133,11 @@
     </div>
 @endsection
 
-{{-- JAVASCRIPT --}}
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // Global variables untuk menyimpan intended action
+    // Menyimpan intended action
     let intendedAction = {
         type: '', // 'wishlist' atau 'cart'
         productId: null,
@@ -164,7 +163,6 @@ document.addEventListener('DOMContentLoaded', () => {
         guestModal.show();
     };
 
-    // Setup redirect buttons dengan intended action
     const setupRedirectButtons = () => {
         const loginBtn = document.querySelector('.login-redirect-btn');
         const registerBtn = document.querySelector('.register-redirect-btn');
@@ -206,13 +204,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Initialize redirect buttons
+    // Menjalankan fungsi-fungsi di atas
     setupRedirectButtons();
-
-    // Check intended action on page load (setelah kembali dari login/register)
     checkIntendedAction();
 
-    // --- FUNGSI 1: MENGATUR KUANTITAS ---
+    // MENGATUR KUANTITAS
     function changeQty(delta) {
         const qtyInput = document.getElementById('qtyInput');
         let currentQty = parseInt(qtyInput.value);
@@ -232,16 +228,15 @@ document.addEventListener('DOMContentLoaded', () => {
         qtyInput.value = newQty;
     }
 
-    // --- FUNGSI 2: WISHLIST dengan Login Check ---
+    // WISHLIST dengan Login Check
     document.querySelectorAll('.wishlist-btn').forEach(btn => {
         btn.addEventListener('click', function (e) {
             const productId = this.getAttribute('data-product-id');
 
-            // --- GUEST RESTRICTION ---
+            // Ketika user belum log in
             if (!window.IS_LOGGED_IN) {
                 e.preventDefault();
 
-                // Callback untuk setelah login/register
                 const afterLoginCallback = () => {
                     const icon = this.querySelector('i');
                     icon.classList.toggle('bi-heart');
@@ -257,7 +252,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // --- LOGGED-IN USER LOGIC ---
             const icon = this.querySelector('i');
             icon.classList.toggle('bi-heart');
             icon.classList.toggle('bi-heart-fill');
@@ -272,11 +266,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- FUNGSI 3: KERANJANG dengan Login Check ---
+    // KERANJANG dengan Login Check
     const cartForm = document.getElementById('cartForm');
     if (cartForm) {
         cartForm.addEventListener('submit', function(e) {
-            // --- GUEST RESTRICTION ---
             if (!window.IS_LOGGED_IN) {
                 e.preventDefault();
                 showGuestRestrictionModal('cart', "{{ $product->id }}", "{{ $product->name }}");
@@ -284,15 +277,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Mock functions untuk wishlist
     function addToWishlist(productId) {
         console.log('Adding to wishlist:', productId);
-        // AJAX implementation here
     }
 
     function removeFromWishlist(productId) {
         console.log('Removing from wishlist:', productId);
-        // AJAX implementation here
     }
 });
 </script>
