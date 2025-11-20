@@ -243,28 +243,25 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
 
-        // Cek status login dari PHP ke JS
         const isLoggedIn = @json(auth()->check());
 
-        // Siapin modal
         const guestModalElement = document.getElementById('guestRestrictionModal');
         const guestModal = new bootstrap.Modal(guestModalElement);
         const modalMessage = document.getElementById('modalActionMessage');
 
-        // 1. Logika Tombol Wishlist
+        // Logika Wishlist
         document.querySelectorAll('.wishlist-btn').forEach(button => {
             button.addEventListener('click', function(e) {
                 e.preventDefault();
-                const actionName = this.dataset.actionName; // "wishlist"
+                const actionName = this.dataset.actionName; 
 
-                // KALO BELUM LOGIN: Tampilkan modal
+                // Kalo blm login nampilin pop up
                 if (!isLoggedIn) {
                     modalMessage.textContent = 'Untuk menambahkan produk ke ' + actionName;
                     guestModal.show();
                     return; // Stop
                 }
 
-                // KALO SUDAH LOGIN: Kirim data (AJAX/Fetch)
                 const productId = this.dataset.productId;
                 const icon = this.querySelector('i');
 
@@ -272,7 +269,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}' // Penting untuk keamanan
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}' 
                     },
                     body: JSON.stringify({ product_id: productId })
                 })
@@ -291,20 +288,19 @@
             });
         });
 
-        // 2. Logika Tombol Keranjang
+        // Logika Keranjang
         document.querySelectorAll('.add-to-cart-btn').forEach(button => {
             button.addEventListener('click', function(e) {
                 e.preventDefault();
                 const actionName = this.dataset.actionName; // "keranjang"
 
-                // KALO BELUM LOGIN: Tampilkan modal
+                // Kalo blm login nampilin pop up
                 if (!isLoggedIn) {
                     modalMessage.textContent = 'Untuk menambahkan produk ke ' + actionName;
                     guestModal.show();
                     return; // Stop
                 }
 
-                // KALO SUDAH LOGIN: Kirim data (AJAX/Fetch)
                 const productId = this.dataset.productId;
                 const icon = this.querySelector('i');
 
