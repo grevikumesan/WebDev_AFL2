@@ -4,37 +4,43 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
-class ProductController extends Controller {
+class ProductController extends Controller
+{
+    public function index(Request $request)
+    {
+        $query = Product::query()->with('category');
 
-    public function index(Request $request) {
-        $query = Product::with('category');
-
-        // nampilin semua produk yang mirip dengan hasil input search
         if ($request->has('search')) {
-            $query->where('name', 'like', '%' . $request->input('search') . '%');
+            $query->where('name', 'like', '%' . $request->search . '%');
         }
 
-        // filter kategori
-        if ($request->has('kategori')) {
-            $query->whereHas('category', function ($q) use ($request) {
-                $q->where('name', $request->input('kategori'));
-            });
+        $products = $query->paginate(12);
+
+        $wishlistProductIds = [];
+        if (Auth::check()) {
+            $wishlistProductIds = Auth::user()->wishlistProducts()->pluck('products.id')->toArray();
         }
 
-        $products = $query->paginate(15);
-
-        return view('products', [
-            'title' => 'Daftar Produk',
-            'products' => $products
-        ]);
+        return view('products', compact('products', 'wishlistProductIds'));
     }
 
-    public function show(Product $product) {
-        $product->load('category'); 
+    public function show(Product $product)
+    {
+        $product->load('category');
+
+        // AMBIL STATUS WISHLIST (Untuk Halaman Detail)
+        // Agar saat masuk detail, tombolnya tahu harus merah atau putih
+        $isWishlist = false;
+        if (Auth::check()) {
+            $isWishlist = Auth::user()->wishlistProducts()->where('product_id', $product->id)->exists();
+        }
+
         return view('product-detail', [
             'title' => 'Detail Produk',
-            'product' => $product
+            'product' => $product,
+            'isWishlist' => $isWishlist // Kirim variabel ini ke view
         ]);
     }
 }

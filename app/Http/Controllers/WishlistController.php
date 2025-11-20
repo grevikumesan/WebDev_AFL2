@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Product;
+use Illuminate\Support\Facades\Log;
+use App\Models\User;
 
 class WishlistController extends Controller
 {
@@ -13,36 +14,46 @@ class WishlistController extends Controller
     }
 
     public function index() {
-        $wishlistItems = Auth::user()->wishlistProducts()->get();
-
+        $wishlistItems = Auth::user()->wishlistProducts()->with('category')->get();
         return view('wishlist.index', compact('wishlistItems'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'product_id' => 'required|exists:products,id',
-        ]);
-
-        $user = Auth::user();
-        $productId = $request->product_id;
-
-        if (!$user->wishlistProducts()->where('product_id', $productId)->exists()) {
-            $user->wishlistProducts()->attach($productId);
-            return back()->with('success', 'Produk ditambahkan ke wishlist!');
+        // 1. Validasi sederhana
+        if (!$request->product_id) {
+            return response()->json(['status' => 'error', 'message' => 'ID Produk tidak valid'], 400);
         }
 
-        if ($request->wantsJson()) {
-            return response()->json(['status' => 'info', 'message' => 'Produk ini sudah ada di wishlist.']);
+        try {
+            $user = Auth::user();
+            $productId = $request->product_id;
+
+            // 2. Gunakan toggle() dan tangkap hasilnya
+            // toggle mengembalikan array: ['attached' => [...], 'detached' => [...]]
+            $changes = $user->wishlistProducts()->toggle($productId);
+
+            // 3. Cek apa yang terjadi
+            $isAdded = count($changes['attached']) > 0;
+            $action = $isAdded ? 'added' : 'removed';
+            $message = $isAdded ? 'Berhasil ditambahkan ke wishlist!' : 'Dihapus dari wishlist.';
+
+            // 4. Return JSON Pasti
+            return response()->json([
+                'status' => 'success',
+                'action' => $action,
+                'message' => $message,
+                'product_id' => $productId // Kirim balik ID untuk verifikasi di JS
+            ]);
+
+        } catch (\Exception $e) {
+            // Log error di server (storage/logs/laravel.log)
+            Log::error('Wishlist Error: ' . $e->getMessage());
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Terjadi kesalahan server.'
+            ], 500);
         }
-
-        return back()->with('info', 'Produk ini sudah ada di wishlist.');
-    }
-
-    public function destroy(Product $product)
-    {
-        Auth::user()->wishlistProducts()->detach($product->id);
-
-        return back()->with('success', 'Produk dihapus dari wishlist.');
     }
 }

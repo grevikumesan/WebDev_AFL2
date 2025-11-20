@@ -1,339 +1,432 @@
 @extends('layouts.main')
 
-@section('title')
-    {{ $title }}
-@endsection
+@section('title', 'Daftar Produk')
 
 @section('main_content')
-    <h1 class="text-center mb-5 fw-bold text-success" style="color:#2d5a3a !important;">
-        Daftar Produk Kami
-    </h1>
 
-    {{-- Search Bar --}}
-    <div class="row justify-content-center mt-4 pb-5">
-        <div class="col-md-8">
-            <form action="{{ route('products.index') }}" method="GET" class="d-flex bg-white shadow-lg rounded-pill p-2"
-                  autocomplete="off">
-                <input
-                    type="text"
-                    name="search"
-                    class="form-control border-0 rounded-pill px-3 shadow-none"
-                    placeholder="🔍 Cari produk... contoh: gula, rokok, sabun"
-                    style="font-size: 1.05rem; background-color: transparent; outline: none;"
-                    autocomplete="off">
-                <button class="btn btn-soft-green rounded-pill px-4 fw-semibold shadow-none border-0" type="submit"
-                        style="background-color: #81c784; color: white;">
-                    Cari
-                </button>
+    {{-- HEADER --}}
+    <div class="text-center mb-4">
+        <h1 class="fw-bold section-title">Daftar Produk Kami</h1>
+    </div>
+
+    {{-- SEARCH --}}
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-8 col-lg-6">
+            <form action="{{ route('products.index') }}" method="GET" class="search-box shadow-sm">
+                <input type="text" name="search" class="form-control" placeholder="Cari produk... (misal: gula, beras)"
+                    autocomplete="off" value="{{ request('search') }}">
+                <button class="btn btn-search" type="submit">Cari</button>
             </form>
         </div>
     </div>
 
-    @if($products->count() > 0)
-        <div class="row">
-            @foreach($products as $product)
-                 <div class="col-6 col-md-4 mb-3">
-                    <div class="card h-100 border-0 shadow-sm"
-                        style="background-color:#ffffff; border-radius:16px; overflow:hidden;">
-                        {{-- Wrapper Gambar --}}
-                        <div class="product-image-wrapper"
-     style="width:100%; height:250px; display:flex; align-items:center; justify-content:center; background-color:#f7faf9; border-top-left-radius:16px; border-top-right-radius:16px;">
+    {{-- LIST PRODUK --}}
+    @if ($products->count() > 0)
+        <div class="row g-2 g-md-4">
+            @foreach ($products as $product)
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card h-100 border-0 shadow-sm product-card">
 
-                            <img src="{{ asset('images/' . $product->image) }}"
-                                 alt="{{ $product->name }}"
-                                 style="
-                                     max-width:100%;
-                                     max-height:100%;
-                                     object-fit:contain;
-                                     border-top-left-radius:16px;
-                                     border-top-right-radius:16px;">
+                        {{-- IMAGE (FIXED HEIGHT 250px) --}}
+                        <div class="image-wrapper">
+                            {{-- PERBAIKAN ERROR DISINI: Gunakan optional chaining atau default value --}}
+                            <span class="category-badge">{{ $product->category->name ?? 'Umum' }}</span>
+
+                            <a href="{{ route('products.show', $product->id) }}">
+                                <img src="{{ asset('images/' . $product->image) }}" alt="{{ $product->name }}"
+                                    loading="lazy">
+                            </a>
                         </div>
 
-                        <div class="card-body" style="color:#335b48;">
-                            <span class="badge rounded-pill mb-3 px-3 py-2"
-                                  style="background-color:#bcead5; color:#2d5a3a; font-weight:500;">
-                                {{ $product->category->name }}
-                            </span>
+                        {{-- CARD BODY --}}
+                        <div class="card-body d-flex flex-column p-2 p-md-3">
+                            <h5 class="product-title mb-1">
+                                <a href="{{ route('products.show', $product->id) }}" class="text-decoration-none text-dark">
+                                    {{ $product->name }}
+                                </a>
+                            </h5>
 
-                            <h5 class="card-title fw-semibold">{{ $product->name }}</h5>
-                            <p class="fw-bold fs-5" style="color:#3b7d5e;">
+                            <p class="product-price mb-1">
                                 Rp {{ number_format($product->price, 0, ',', '.') }}
-                                @if($product->unit)
-                                    / {{ $product->unit }}
+                                @if ($product->unit)
+                                    <small class="unit-text text-muted fw-normal">/ {{ $product->unit }}</small>
                                 @endif
                             </p>
 
-                            <p class="mb-3" style="color:#2d5a3a; font-weight:600;">
-                                Stok: {{ $product->stock }}
+                            {{-- LOGIKA STOK --}}
+                            <p class="product-stock text-muted mb-2">
+                                @if ($product->stock > 0)
+                                    Stok: {{ $product->stock }}
+                                @else
+                                    <span class="text-danger fw-bold">Stok Habis</span>
+                                @endif
                             </p>
 
-                            {{-- KUANTITAS & KERANJANG --}}
-                            <div class="cart-box-wrapper mb-2" style="display:none;">
-                                <div class="p-3 border rounded shadow-sm bg-light cart-box">
-                                    <h6 class="fw-bold mb-2 cart-product-name" style="color:#2d5a3a;">
-                                        {{ $product->name }}
-                                    </h6>
-                                    <div class="d-flex align-items-center mb-2 gap-2">
-                                        <button type="button" class="btn-decrease" style="background:none; border:none; font-size:18px; font-weight:bold; color:#2d5a3a;">-</button>
-                                        <input type="text" class="form-control qty-input text-center" value="1" readonly
-                                               style="width:50px; border:none; background:transparent; color:#2e5947; font-weight:600;">
-                                        <button type="button" class="btn-increase" style="background:none; border:none; font-size:18px; font-weight:bold; color:#2d5a3a;">+</button>
-                                    </div>
-                                    <button type="button" class="btn-add-cart btn btn-sm w-100"
-                                            style="background-color:#bcead5; color:#2d5a3a; font-weight:600; border:none; border-radius:8px; font-size:0.9rem;">
-                                        Tambah ke Keranjang
-                                    </button>
-                                    <p class="added-msg text-success fw-bold mt-2" style="display:none; font-size:0.9rem;">Sudah ditambahkan ke keranjang</p>
-                                </div>
-                            </div>
-
-                            <div class="d-flex flex-column flex-sm-row justify-content-start align-items-center product-card-action gap-2 gap-sm-3 mt-3">
-                                {{-- Lihat Detail --}}
+                            {{-- TOMBOL ACTION (Rata Bawah) --}}
+                            <div class="mt-auto d-flex align-items-center gap-2 w-100">
                                 <a href="{{ route('products.show', $product->id) }}"
-                                class="btn btn-detail w-100 w-sm-auto flex-grow-1 flex-sm-grow-1"
-                                style="background-color:#eafaf1; color:#2d5a3a; border:1px solid #bcead5; font-weight:500; border-radius:10px; transition:all 0.3s;">
-                                    Lihat Detail
+                                    class="btn btn-outline-success btn-sm flex-grow-1 btn-detail">
+                                    Detail
                                 </a>
 
-                                {{-- Container untuk icon di mobile --}}
-                                <div class="d-flex d-sm-none justify-content-center w-100 gap-4 mobile-icons">
-                                    {{-- Tombol Tambah ke Keranjang --}}
-                                    <button type="button"
-                                            class="p-0 border-0 add-to-cart-btn icon-btn"
-                                            data-action-name="keranjang"
-                                            data-product-id="{{ $product->id }}"
-                                            data-product-name="{{ $product->name }}"
-                                            data-product-stock="{{ $product->stock }}"
-                                            style="background:none; color:#2d5a3a; cursor:pointer;">
-                                        <i class="bi bi-cart-plus-fill fs-3"></i>
-                                    </button>
+                                <div class="d-flex gap-1">
+                                    {{-- KERANJANG (Cek Stok) --}}
+                                    @if ($product->stock > 0)
+                                        <button type="button" class="btn-icon action-btn"
+                                            data-url="{{ route('cart.store') }}" data-action="Keranjang"
+                                            data-product-id="{{ $product->id }}">
+                                            <i class="bi bi-cart-plus-fill pointer-events-none"></i>
+                                        </button>
+                                    @else
+                                        <button type="button" class="btn-icon bg-secondary text-white border-0" disabled
+                                            title="Stok Habis">
+                                            <i class="bi bi-x-circle"></i>
+                                        </button>
+                                    @endif
 
-                                    {{-- Tombol Wishlist --}}
-                                    <button class="p-0 border-0 wishlist-btn"
-                                            data-action-name="wishlist"
-                                            data-product-id="{{ $product->id }}"
-                                            style="background:none; color:#3b7d5e; cursor:pointer;">
-                                        <i class="bi bi-heart fs-3"></i>
-                                    </button>
-                                </div>
-
-                                {{-- Icon untuk desktop --}}
-                                <div class="d-none d-sm-flex align-items-center gap-3 desktop-icons">
-                                    {{-- Tombol Tambah ke Keranjang --}}
-                                    <button type="button"
-                                            class="p-0 border-0 add-to-cart-btn icon-btn"
-                                            data-action-name="keranjang"
-                                            data-product-id="{{ $product->id }}"
-                                            data-product-name="{{ $product->name }}"
-                                            data-product-stock="{{ $product->stock }}"
-                                            style="background:none; color:#2d5a3a; cursor:pointer;">
-                                        <i class="bi bi-cart-plus-fill fs-3"></i>
-                                    </button>
-
-                                    {{-- Tombol Wishlist --}}
-                                    <button class="p-0 border-0 wishlist-btn"
-                                            data-action-name="wishlist"
-                                            data-product-id="{{ $product->id }}"
-                                            style="background:none; color:#3b7d5e; cursor:pointer;">
-                                        <i class="bi bi-heart fs-3"></i>
+                                    {{-- WISHLIST --}}
+                                    <button type="button" class="btn-icon action-btn text-muted"
+                                        data-url="{{ route('wishlist.store') }}" data-action="Wishlist"
+                                        data-product-id="{{ $product->id }}">
+                                        <i class="bi bi-heart pointer-events-none"></i>
                                     </button>
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
             @endforeach
         </div>
+
+        {{-- PAGINATION --}}
+        <div class="d-flex justify-content-end align-items-center mt-5">
+            {{ $products->links() }}
+        </div>
     @else
-        <div class="row">
-            <div class="col-12 text-center">
-                <div class="alert"
-                     style="background-color:#eafaf1; color:#335b48; border:1px solid #bcead5; border-radius:12px;">
-                    <h4 class="alert-heading fw-bold">Maaf!</h4>
-                    <p>Produk yang Anda cari tidak ditemukan.</p>
-                    <hr style="border-top:1px solid #bcead5;">
-                    <a href="{{ route('products.index') }}"
-                       class="btn"
-                       style="background-color:#bcead5; color:#2d5a3a; font-weight:500; border-radius:10px;">
-                        Lihat Semua Produk
-                    </a>
-                </div>
+        {{-- EMPTY STATE --}}
+        <div class="text-center py-5">
+            <div class="alert d-inline-block px-4 py-3 bg-light border rounded-4">
+                <h4 class="fw-bold h5 text-muted">Produk tidak ditemukan</h4>
+                <a href="{{ route('products.index') }}" class="btn btn-sm btn-success mt-2">Reset Pencarian</a>
             </div>
         </div>
     @endif
 
-<!-- Guest Restriction Modal -->
-<div class="modal fade" id="guestRestrictionModal" tabindex="-1"
-         data-bs-backdrop="true" data-bs-keyboard="true"
-         aria-labelledby="guestRestrictionModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content" style="border-radius: 16px; overflow: hidden;">
-                <div class="modal-header text-center" style="background:#bcead5; color:#2d5a3a; border-bottom: none;">
-                    <h5 class="modal-title w-100 fw-bold" id="guestRestrictionModalLabel">
-                        Toko Wilujeng
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body text-center p-4">
-                    <div class="mb-4">
-                        <div class="icon-wrapper mb-3">
-                            <i class="fas fa-users fa-3x" style="color: #2d5a3a;"></i>
-                        </div>
-                        <h5 style="color: #2d5a3a; margin-bottom: 8px;">Bergabunglah Dengan Kami</h5>
-                        <p class="text-muted" id="modalActionMessage" style="margin-bottom: 4px;">
-                            Untuk menambahkan produk ke wishlist atau keranjang belanja
-                        </p>
-                        <p class="text-muted small">
-                            Nikmati pengalaman berbelanja yang lebih personal
-                        </p>
-                    </div>
-
-                    <div class="d-grid gap-2 mb-3">
-                        <a href="{{ route('login') }}" class="btn py-3 fw-semibold login-redirect-btn"
-                           style="background-color: #2d5a3a; color: white; border-radius: 12px; font-size: 1.1rem;">
-                            Masuk ke Akun
-                        </a>
-                    </div>
-
-                    <div class="text-center">
-                        <p class="text-muted mb-2" style="font-size: 0.9rem;">Belum punya akun?</p>
-                        <a href="{{ route('register') }}" class="text-decoration-none fw-semibold register-redirect-btn"
-                           style="color: #2d5a3a; font-size: 1rem;">
-                            Daftar Sekarang - Gratis
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 @endsection
 
 @push('styles')
-<style>
-/* Mobile View */
-@media (max-width: 576px) {
-    .product-card-action .btn-detail {
-        font-size: 0.55rem !important;
-        padding: 0.3rem 0.5rem !important;
-        line-height: 1.2 !important;
-        min-height: 28px;
-    }
+    <style>
+        .section-title {
+            color: #2d5a3a;
+            font-size: 2rem;
+        }
 
-    .mobile-icons .add-to-cart-btn i,
-    .mobile-icons .wishlist-btn i {
-        font-size: 1.1rem !important;
-    }
-}
+        .search-box {
+            display: flex;
+            background: white;
+            border-radius: 50px;
+            padding: 4px;
+            border: 1px solid #bcead5;
+        }
 
-/* Desktop View */
-@media (min-width: 577px) {
-    .product-card-action {
-        flex-direction: row !important;
-    }
+        .search-box input {
+            border: none;
+            box-shadow: none;
+            padding-left: 20px;
+            background: transparent;
+        }
 
-    .desktop-icons .add-to-cart-btn i,
-    .desktop-icons .wishlist-btn i {
-        font-size: 1.3rem !important;
-    }
-}
-</style>
+        .search-box .btn-search {
+            background-color: #81c784;
+            color: white;
+            border-radius: 50px;
+            padding: 6px 24px;
+            border: none;
+            transition: 0.3s;
+        }
+
+        .search-box .btn-search:hover {
+            background-color: #66bb6a;
+        }
+
+        .product-card {
+            border-radius: 12px;
+            background: #fff;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05) !important;
+        }
+
+        .image-wrapper {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            background-color: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            transition: transform 0.3s;
+        }
+
+        .product-card:hover .image-wrapper img {
+            transform: scale(1.1);
+        }
+
+        /* Fix Image Fit for first items if needed, or remove if general rule is enough */
+        .row.g-2>.col-6:nth-child(1) .image-wrapper img,
+        .row.g-2>.col-6:nth-child(2) .image-wrapper img,
+        .row.g-2>.col-6:nth-child(3) .image-wrapper img {
+            width: 85% !important;
+            height: 85% !important;
+            object-fit: contain !important;
+        }
+
+        .category-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #2d5a3a;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 2;
+        }
+
+        .product-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 1rem;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            min-height: 2.6em;
+        }
+
+        .product-price {
+            color: #2e7d32;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .product-stock {
+            font-size: 0.8rem;
+        }
+
+        .btn-detail {
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .btn-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            border: 1px solid #bcead5;
+            background: #eafaf1;
+            color: #2d5a3a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+
+        .btn-icon:hover {
+            background: #2d5a3a;
+            color: white;
+            border-color: #2d5a3a;
+        }
+
+        .btn-icon:active {
+            transform: scale(0.9);
+        }
+
+        .pointer-events-none {
+            pointer-events: none;
+        }
+
+        .pagination-info {
+            font-size: 0.9rem;
+        }
+
+        .pagination .page-item .page-link {
+            color: #2d5a3a;
+            border: 1px solid #bcead5;
+            margin: 0 2px;
+            border-radius: 6px;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #2d5a3a;
+            border-color: #2d5a3a;
+            color: white;
+        }
+
+        @media (max-width: 576px) {
+            .image-wrapper {
+                height: 180px;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+                margin-bottom: 1rem;
+            }
+
+            .product-title {
+                font-size: 0.85rem;
+                min-height: 2.6em;
+            }
+
+            .product-price {
+                font-size: 0.95rem;
+            }
+
+            .card-body {
+                padding: 0.5rem !important;
+            }
+
+            .btn-detail {
+                font-size: 0.75rem;
+                padding: 4px 8px;
+            }
+
+            .btn-icon {
+                width: 30px;
+                height: 30px;
+                font-size: 0.9rem;
+            }
+
+            .category-badge {
+                font-size: 0.6rem;
+            }
+
+            .pagination-info {
+                font-size: 0.75rem;
+            }
+
+            .d-flex.justify-content-between {
+                flex-direction: column;
+                gap: 10px;
+                align-items: center !important;
+            }
+        }
+    </style>
 @endpush
 
 @push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
+    {{-- Script Cart/Wishlist tetap sama seperti sebelumnya --}}
+    <script>
+        @if (Auth::check() && isset($wishlistProductIds))
+            window.WishlistSync.set(@json($wishlistProductIds));
+        @endif
 
-        // Cek status login dari PHP ke JS
-        const isLoggedIn = @json(auth()->check());
+        document.addEventListener('DOMContentLoaded', function() {
+            const modalEl = document.getElementById('guestRestrictionModal');
+            const toastEl = document.getElementById('liveToast');
+            const toastBody = document.getElementById('toastMessage');
+            const modalMsg = document.getElementById('modalActionMessage');
+            const guestModal = modalEl ? new bootstrap.Modal(modalEl) : null;
+            const toast = toastEl ? new bootstrap.Toast(toastEl) : null;
 
-        // Siapin modal
-        const guestModalElement = document.getElementById('guestRestrictionModal');
-        const guestModal = new bootstrap.Modal(guestModalElement);
-        const modalMessage = document.getElementById('modalActionMessage');
+            function showToast(message, type = 'success') {
+                if (!toast) return;
+                toastBody.textContent = message;
+                toastEl.className = 'toast align-items-center text-white border-0 shadow';
+                if (type === 'success') toastEl.classList.add('bg-success');
+                else if (type === 'info') toastEl.classList.add('bg-info');
+                else toastEl.classList.add('bg-danger');
+                toast.show();
+            }
 
-        // 1. Logika Tombol Wishlist
-        document.querySelectorAll('.wishlist-btn').forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-                const actionName = this.dataset.actionName; // "wishlist"
+            async function sendRequest(button) {
+                const url = button.dataset.url;
+                const action = button.dataset.action;
+                const productId = button.dataset.productId;
 
-                // KALO BELUM LOGIN: Tampilkan modal
-                if (!isLoggedIn) {
-                    modalMessage.textContent = 'Untuk menambahkan produk ke ' + actionName;
-                    guestModal.show();
-                    return; // Stop
+                if (!window.IS_LOGGED_IN) {
+                    if (modalMsg) modalMsg.textContent = `Login dulu untuk akses ${action}.`;
+                    if (guestModal) guestModal.show();
+                    return;
                 }
 
-                // KALO SUDAH LOGIN: Kirim data (AJAX/Fetch)
-                const productId = this.dataset.productId;
-                const icon = this.querySelector('i');
+                const originalHTML = button.innerHTML;
+                button.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"></div>';
+                button.disabled = true;
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-                fetch('{{ route('wishlist.store') }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}' // Penting untuk keamanan
-                    },
-                    body: JSON.stringify({ product_id: productId })
-                })
-                .then(response => response.json())
-                .then(data => {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            product_id: productId,
+                            quantity: 1
+                        })
+                    });
+
+                    if (!response.ok) throw new Error('Server Error');
+                    const data = await response.json();
+
                     if (data.status === 'success') {
-                        // Ganti ikon jadi 'filled'
-                        icon.classList.remove('bi-heart');
-                        icon.classList.add('bi-heart-fill');
-                        button.disabled = true; // Biar nggak diklik lagi
+                        if (action === 'Wishlist') {
+                            button.innerHTML = '<i class="bi bi-heart-fill pointer-events-none"></i>';
+                            button.classList.add('text-danger', 'border-danger');
+                        } else {
+                            button.innerHTML = '<i class="bi bi-check-lg fw-bold"></i>';
+                            button.classList.add('btn-success', 'text-white');
+                        }
+                        showToast(data.message, 'success');
+                    } else if (data.status === 'info') {
+                        if (action === 'Wishlist') {
+                            button.innerHTML = '<i class="bi bi-heart-fill pointer-events-none"></i>';
+                            button.classList.add('text-danger', 'border-danger');
+                        }
+                        showToast(data.message, 'info');
                     }
-                    // Tampilkan notifikasi (ganti 'alert' dengan 'toast' nanti)
-                    alert(data.message);
-                })
-                .catch(error => console.error('Error:', error));
-            });
-        });
-
-        // 2. Logika Tombol Keranjang
-        document.querySelectorAll('.add-to-cart-btn').forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-                const actionName = this.dataset.actionName; // "keranjang"
-
-                // KALO BELUM LOGIN: Tampilkan modal
-                if (!isLoggedIn) {
-                    modalMessage.textContent = 'Untuk menambahkan produk ke ' + actionName;
-                    guestModal.show();
-                    return; // Stop
+                } catch (error) {
+                    showToast("Terjadi kesalahan sistem.", 'error');
+                } finally {
+                    setTimeout(() => {
+                        button.disabled = false;
+                        if (action === 'Keranjang') {
+                            button.innerHTML = originalHTML;
+                            button.classList.remove('btn-success', 'text-white');
+                        }
+                        if (action === 'Wishlist' && !button.classList.contains('text-danger')) {
+                            button.innerHTML = originalHTML;
+                        }
+                    }, 1500);
                 }
+            }
 
-                // KALO SUDAH LOGIN: Kirim data (AJAX/Fetch)
-                const productId = this.dataset.productId;
-                const icon = this.querySelector('i');
-
-                fetch('{{ route('cart.store') }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({
-                        product_id: productId,
-                        quantity: 1  // Kirim quantity 1 sebagai default
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        // Ganti ikon jadi 'checked'
-                        icon.classList.remove('bi-cart-plus-fill');
-                        icon.classList.add('bi-cart-check-fill');
-                        button.disabled = true; // Biar nggak diklik lagi
-                    }
-                    // Tampilkan notifikasi (ganti 'alert' dengan 'toast' nanti)
-                    alert(data.message);
-                })
-                .catch(error => console.error('Error:', error));
+            document.body.addEventListener('click', function(e) {
+                const btn = e.target.closest('.action-btn');
+                if (btn) {
+                    e.preventDefault();
+                    sendRequest(btn);
+                }
             });
         });
-
-    });
-</script>
+    </script>
 @endpush

@@ -6,24 +6,26 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
+use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
 
     public function index() {
-        $users = User::paginate(5);
-        return "List User";
+$users = User::with('orders')->paginate(5);
+        return view('admin.users.index', compact('users'));
     }
 
     public function create() {
-        return "Create User";
+        return view('admin.users.create');
     }
 
     public function store(Request $request) {
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
-            'password' => 'required|min:8',
+            'password' => ['required', Password::min(8)],
             'role' => 'required|in:admin,customer',
             'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
         ]);
@@ -41,11 +43,11 @@ class UserController extends Controller
     }
 
     public function show(User $user) {
-        return "Nampilin detail user: " . $user->name;
+        return view('admin.users.show', compact('user'));
     }
 
     public function edit(User $user) {
-         return "Nampilin form edit user: " . $user->name;
+         return view('admin.users.edit', compact('user'));
     }
 
     public function update(Request $request, User $user) {
@@ -58,7 +60,7 @@ class UserController extends Controller
                 'string',
                 'email',
                 'max:255',
-                \Illuminate\Validation\Rule::unique('users')->ignore($user->id),
+                Rule::unique('users')->ignore($user->id),
             ],
 
             'role' => 'required|in:admin,customer',
@@ -75,7 +77,7 @@ class UserController extends Controller
 
         if ($request->filled('password')) {
             $request->validate([
-                'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::min(8)],
+                'password' => ['required', 'confirmed', Password::min(8)],
             ]);
 
             $validatedData['password'] = $request->password;

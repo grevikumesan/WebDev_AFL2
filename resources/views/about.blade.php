@@ -6,7 +6,7 @@
     <!-- Title-->
     <section class="py-5 text-center bg-light shadow-sm mb-5">
         <div class="container">
-            <h1 class="display-5 fw-bold text-success mb-3">"Tentang Kami</h1>
+            <h1 class="display-5 fw-bold text-success mb-3">Tentang Kami</h1>
             <p class="lead text-muted">Tempat Anda mendapatkan kebutuhan pokok berkualitas sejak 2010</p>
         </div>
     </section>

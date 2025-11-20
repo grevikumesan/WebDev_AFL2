@@ -13,10 +13,7 @@ class CartController extends Controller
     }
 
     public function index() {
-        $userId = Auth::id();
-
-        $cartItems = Cart::where('user_id', $userId)->with('product')->get();
-
+        $cartItems = Cart::where('user_id', Auth::id())->with('product')->get();
         return view('cart.index', compact('cartItems'));
     }
 
@@ -45,33 +42,27 @@ class CartController extends Controller
             ]);
         }
 
+        // RESPON JSON UNTUK AJAX
         if ($request->wantsJson()) {
-            return response()->json(['status' => 'success', 'message' => 'Produk berhasil ditambahkan ke keranjang!']);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Produk berhasil masuk keranjang!'
+            ]);
         }
 
-        return back()->with('success', 'Produk berhasil ditambahkan ke keranjang!');
+        return back()->with('success', 'Produk berhasil masuk keranjang!');
     }
 
     public function update(Request $request, Cart $cart) {
-        if ($cart->user_id !== Auth::id()) {
-            abort(403);
-        }
-
-        $request->validate([
-            'quantity' => 'required|integer|min:1',
-        ]);
-
+        if ($cart->user_id !== Auth::id()) abort(403);
+        $request->validate(['quantity' => 'required|integer|min:1']);
         $cart->update(['quantity' => $request->quantity]);
-
-        return redirect()->route('cart.index')->with('success', 'Jumlah produk diupdate.');
+        return redirect()->route('cart.index')->with('success', 'Jumlah diupdate.');
     }
 
     public function destroy(Cart $cart) {
-        if ($cart->user_id !== Auth::id()) {
-            abort(403);
-        }
-
+        if ($cart->user_id !== Auth::id()) abort(403);
         $cart->delete();
-        return redirect()->route('cart.index')->with('success', 'Produk dihapus dari keranjang.');
+        return redirect()->route('cart.index')->with('success', 'Dihapus dari keranjang.');
     }
 }

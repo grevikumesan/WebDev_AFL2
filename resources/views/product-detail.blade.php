@@ -1,319 +1,344 @@
 @extends('layouts.main')
 
 @section('title')
-    {{ $product->name ?? $title }}
+    {{ $product->name ?? 'Detail Produk' }}
 @endsection
 
 @section('main_content')
-    @if($product)
-        <h1 class="text-center mb-5 fw-bold text-success" style="color:#2d5a3a !important;">
+    @if (isset($product) && $product)
+        {{-- HEADER --}}
+        <h1 class="text-center mb-5 fw-bold section-title" style="color:#2d5a3a;">
             Detail Produk
         </h1>
 
         <div class="row align-items-start py-4">
             {{-- KOLOM KIRI: GAMBAR --}}
             <div class="col-md-6 mb-4 text-center">
-                <img src="{{ asset('images/' . $product->image) }}"
-                    class="img-fluid rounded shadow-sm"
-                    alt="{{ $product->name }}"
-                    style="border-radius:18px; max-height:400px; object-fit:cover;">
+                <div class="p-3 bg-light rounded-4 shadow-sm d-flex align-items-center justify-content-center"
+                    style="min-height: 400px;">
+                    <img src="{{ asset('images/' . $product->image) }}" class="img-fluid" alt="{{ $product->name }}"
+                        style="max-height:400px; object-fit:contain;">
+                </div>
             </div>
 
-            {{-- KOLOM KANAN: DETAIL PRODUK --}}
+            {{-- KOLOM KANAN: INFO --}}
             <div class="col-md-6" style="color:#335b48;">
 
                 <span class="badge rounded-pill mb-3 px-3 py-2"
-                      style="background-color:#bcead5; color:#2d5a3a; font-weight:500;">
-                    {{ $product->category->name }}
+                    style="background-color:#bcead5; color:#2d5a3a; font-weight:500;">
+                    {{ $product->category->name ?? 'Umum' }}
                 </span>
 
                 <div class="d-flex align-items-center justify-content-between mb-3">
-                    <h1 class="fw-bold mb-0" style="color:#2d5a3a;">{{ $product->name }}</h1>
+                    <h1 class="fw-bold mb-0 text-dark">{{ $product->name }}</h1>
 
-                    {{-- IKON HATI (WISHLIST) --}}
-                    <button class="btn wishlist-btn p-0 border-0"
-                            data-product-id="{{ $product->id }}"
-                            style="font-size: 2rem; color:#3b7d5e; background:none; line-height: 1;">
-                         <i class="bi bi-heart"></i>
+                    {{-- TOMBOL WISHLIST --}}
+                    <button type="button" class="btn p-0 border-0 action-btn text-muted"
+                        data-url="{{ route('wishlist.store') }}" data-action="Wishlist"
+                        data-product-id="{{ $product->id }}"
+                        style="font-size: 2rem; background:none; line-height: 1; transition: transform 0.2s;">
+                        <i class="bi bi-heart"></i>
                     </button>
                 </div>
 
-                <p class="fw-bold fs-4" style="color:#3b7d5e;">
-                    Rp {{ number_format($product->price, 0, ',', '.') }}
-                    @if($product->unit)
-                        / {{ $product->unit }}
+                {{-- LOGIKA TAMPILAN STOK --}}
+                <p class="fw-bold fs-5" style="color:#2e5947;">
+                    @if($product->stock > 0)
+                        Stok Tersedia: <span id="maxStock">{{ $product->stock }}</span>
+                    @else
+                        <span class="text-danger">Stok Habis</span>
                     @endif
                 </p>
-                <p class="fw-bold" style="color:#2e5947;">
-                    Stok Tersedia: {{ $product->stock }}
+
+                <hr class="my-4" style="border-color: #bcead5;">
+
+                {{-- KONTROL QUANTITY & HARGA --}}
+                <div class="d-flex flex-wrap align-items-center gap-4 mb-4">
+                    {{-- Input Jumlah --}}
+                    <div>
+                        <label for="qtyInput" class="fw-bold mb-2 d-block small text-uppercase"
+                            style="color:#2e5947; letter-spacing: 1px;">Jumlah</label>
+                        <div class="d-flex align-items-center shadow-sm"
+                            style="background:white; border:1px solid #bcead5; border-radius:50px; padding:5px 10px;">
+
+                            <button type="button" onclick="changeQty(-1)"
+                                class="btn btn-sm rounded-circle d-flex align-items-center justify-content-center"
+                                style="width: 32px; height: 32px; background:#eafaf1; color:#2d5a3a;"
+                                {{ $product->stock == 0 ? 'disabled' : '' }}>
+                                <i class="bi bi-dash fw-bold"></i>
+                            </button>
+
+                            <input id="qtyInput" type="text" value="{{ $product->stock > 0 ? 1 : 0 }}"
+                                class="form-control text-center mx-2 border-0 fw-bold"
+                                style="width:50px; background:transparent; color:#2e5947; font-size: 1.1rem;" readonly>
+
+                            <button type="button" onclick="changeQty(1)"
+                                class="btn btn-sm rounded-circle d-flex align-items-center justify-content-center"
+                                style="width: 32px; height: 32px; background:#eafaf1; color:#2d5a3a;"
+                                {{ $product->stock == 0 ? 'disabled' : '' }}>
+                                <i class="bi bi-plus fw-bold"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    {{-- Total Harga --}}
+                    <div>
+                        <label class="fw-bold mb-2 d-block small text-uppercase"
+                            style="color:#2e5947; letter-spacing: 1px;">Total Harga</label>
+                        <div id="subtotalDisplay" class="fw-bold fs-2" style="color:#2d5a3a;">
+                            Rp {{ number_format($product->stock > 0 ? $product->price : 0, 0, ',', '.') }}
+                        </div>
+                    </div>
+                </div>
+
+                {{-- TOMBOL AKSI --}}
+                <div class="d-flex flex-column flex-sm-row gap-3 mt-4">
+                    @if ($product->stock > 0)
+                        {{-- Tambah Keranjang --}}
+                        <button type="button" class="btn btn-lg flex-grow-1 action-btn shadow-sm"
+                            data-url="{{ route('cart.store') }}" data-action="Keranjang"
+                            data-product-id="{{ $product->id }}"
+                            style="background-color:#eafaf1; color:#2d5a3a; border:1px solid #bcead5; border-radius:12px; font-weight:600;">
+                            <i class="bi bi-cart-plus me-2"></i> Tambah Keranjang
+                        </button>
+
+                        {{-- Beli Sekarang --}}
+                        <button type="button" id="buyNowBtn" class="btn btn-lg flex-grow-1 shadow-sm"
+                            style="background-color:#2d5a3a; color:white; border-radius:12px; font-weight:600;">
+                            Beli Sekarang
+                        </button>
+                    @else
+                        {{-- Tombol Habis --}}
+                        <button type="button" class="btn btn-lg flex-grow-1 shadow-sm bg-secondary text-white border-0"
+                            disabled style="border-radius:12px; font-weight:600;">
+                            <i class="bi bi-x-circle me-2"></i> Stok Habis
+                        </button>
+                    @endif
+                </div>
+
+                <p class="text-muted small mt-3 text-center text-sm-start">
+                    <i class="bi bi-shield-check me-1"></i> Jaminan produk original & berkualitas.
                 </p>
 
-                {{-- FORM QUANTITY + KERANJANG --}}
-                <form action="{{ route('cart.store') }}" method="POST" class="mt-4" id="cartForm">
-                    @csrf
-                    <input type="hidden" name="product_id" value="{{ $product->id }}">
-
-                    <div class="d-flex align-items-end gap-3 mb-4">
-
-                        {{-- Quantity --}}
-                        <div style="max-width:130px;">
-                            <label for="qtyInput" class="fw-bold mb-1" style="color:#2e5947;">Jumlah:</label>
-                            <div class="d-flex align-items-center"
-                                 style="background:#eafaf1; border:1px solid #bcead5; border-radius:10px; padding:6px 10px; height: 44px;">
-
-                                <button type="button" onclick="changeQty(-1)" style="background:none; border:none; font-size:20px; font-weight:bold; color:#2d5a3a;">-</button>
-                                <input id="qtyInput" name="quantity" type="text" value="1"
-                                       class="form-control text-center mx-2"
-                                       style="width:50px; border:none; background:transparent; color:#2e5947; font-weight:600;"
-                                       readonly>
-                                <button type="button" onclick="changeQty(1)" style="background:none; border:none; font-size:20px; font-weight:bold; color:#2d5a3a;">+</button>
-                            </div>
-                        </div>
-
-                        {{-- Tombol Tambah Keranjang (Submit Form) --}}
-                        <button type="submit" class="btn btn-lg flex-grow-1"
-                                 style="background-color:#bcead5; color:#2d5a3a; font-weight:600; border:none; border-radius:10px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; gap:8px;">
-                            <i class="bi bi-cart-plus-fill"></i> Tambah ke Keranjang
-                        </button>
-                    </div>
-                </form>
             </div>
         </div>
     @else
-        <div class="alert alert-danger text-center mt-5" role="alert">
-            <h4 class="alert-heading">Produk Tidak Ditemukan!</h4>
+        <div class="alert alert-warning text-center mt-5 rounded-4 border-0 shadow-sm" role="alert">
+            <i class="bi bi-exclamation-circle fs-1 d-block mb-3"></i>
+            <h4 class="alert-heading fw-bold">Produk Tidak Ditemukan!</h4>
             <p>Maaf, produk yang Anda cari tidak tersedia atau ID-nya salah.</p>
-            <a href="{{ route('products.index') }}" class="btn mt-3" style="background-color:#bcead5; color:#2d5a3a;">Kembali ke Daftar Produk</a>
+            <a href="{{ route('products.index') }}" class="btn btn-success mt-3 rounded-pill px-4">Kembali ke Daftar
+                Produk</a>
         </div>
     @endif
-
-    <!-- Guest Restriction Modal -->
-    <div class="modal fade" id="guestRestrictionModal" tabindex="-1"
-         data-bs-backdrop="false" data-bs-keyboard="true"
-         aria-labelledby="guestRestrictionModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content" style="border-radius: 16px; overflow: hidden;">
-                <div class="modal-header text-center" style="background:#bcead5; color:#2d5a3a; border-bottom: none;">
-                    <h5 class="modal-title w-100 fw-bold" id="guestRestrictionModalLabel">
-                        Toko Wilujeng
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body text-center p-4">
-                    <div class="mb-4">
-                        <div class="icon-wrapper mb-3">
-                            <i class="fas fa-users fa-3x" style="color: #2d5a3a;"></i>
-                        </div>
-                        <h5 style="color: #2d5a3a; margin-bottom: 8px;">Bergabunglah Dengan Kami</h5>
-                        <p class="text-muted" id="modalActionMessage" style="margin-bottom: 4px;">
-                            Untuk menambahkan produk ke wishlist atau keranjang belanja
-                        </p>
-                        <p class="text-muted small">
-                            Nikmati pengalaman berbelanja yang lebih personal
-                        </p>
-                    </div>
-
-                    <div class="d-grid gap-2 mb-3">
-                        <a href="{{ route('login') }}" class="btn py-3 fw-semibold login-redirect-btn"
-                           style="background-color: #2d5a3a; color: white; border-radius: 12px; font-size: 1.1rem;">
-                            Masuk ke Akun
-                        </a>
-                    </div>
-
-                    <div class="text-center">
-                        <p class="text-muted mb-2" style="font-size: 0.9rem;">Belum punya akun?</p>
-                        <a href="{{ route('register') }}" class="text-decoration-none fw-semibold register-redirect-btn"
-                           style="color: #2d5a3a; font-size: 1rem;">
-                            Daftar Sekarang - Gratis
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 @endsection
 
-{{-- JAVASCRIPT --}}
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-// ===== GLOBAL FUNCTION untuk Quantity (agar bisa diakses dari onclick) =====
-function changeQty(delta) {
-    const qtyInput = document.getElementById('qtyInput');
-    let currentQty = parseInt(qtyInput.value);
-    let maxStock = parseInt(qtyInput.dataset.maxStock || 999); // Baca dari data attribute
+    <script>
+        @if (Auth::check())
+            // Inisialisasi dari backend
+            var initialWishlist = {{ $isWishlist ? 'true' : 'false' }};
+            if (initialWishlist) {
+                window.WishlistSync.add("{{ $product->id }}");
+            }
+        @endif
 
-    let newQty = currentQty + delta;
+        // --- 1. INISIALISASI VARIABEL AMAN ---
+        var productPrice = Number("{{ $product->price ?? 0 }}");
+        var maxStock = Number("{{ $product->stock ?? 0 }}");
+        var defaultProductId = "{{ $product->id ?? '' }}";
+        var cartUrl = "{{ route('cart.store') }}";
 
-    if (newQty < 1) {
-        newQty = 1;
-    }
+        // --- 2. LOGIKA QUANTITY ---
+        function changeQty(delta) {
+            // Jika stok 0, hentikan
+            if(maxStock <= 0) return;
 
-    if (newQty > maxStock) {
-        alert(`Maaf, stok maksimal hanya ${maxStock}.`);
-        newQty = maxStock;
-    }
+            var qtyInput = document.getElementById('qtyInput');
+            if (!qtyInput) return;
 
-    qtyInput.value = newQty;
-}
+            var currentQty = parseInt(qtyInput.value) || 1;
+            var newQty = currentQty + delta;
 
-// Function untuk update quantity dengan tombol +/-
-function updateQuantity(itemId, delta, price) {
-    const qtyInput = document.getElementById(`qty-${itemId}`);
-    let currentQty = parseInt(qtyInput.value);
-    let newQty = currentQty + delta;
+            if (newQty < 1) newQty = 1;
+            if (newQty > maxStock) {
+                newQty = maxStock;
+                alert('Maaf, stok hanya tersisa ' + maxStock + ' item.');
+            }
 
-    // Validasi minimum 1
-    if (newQty < 1) {
-        newQty = 1;
-    }
+            qtyInput.value = newQty;
+            updateSubtotal(newQty);
+        }
 
-    qtyInput.value = newQty;
-    updateSubtotal(itemId, price);
-}
+        function updateSubtotal(qty) {
+            var subtotal = productPrice * qty;
+            var displayEl = document.getElementById('subtotalDisplay');
+            if (displayEl) {
+                // Format rupiah sederhana
+                displayEl.textContent = 'Rp ' + subtotal.toLocaleString('id-ID');
+            }
+        }
 
-// Function untuk update subtotal display
-function updateSubtotal(itemId, price) {
-    const qtyInput = document.getElementById(`qty-${itemId}`);
-    const subtotalElement = document.getElementById(`subtotal-${itemId}`);
+        // --- 3. LOGIKA AJAX ---
+        document.addEventListener('DOMContentLoaded', function() {
 
-    const quantity = parseInt(qtyInput.value) || 1;
-    const subtotal = price * quantity;
+            var modalEl = document.getElementById('guestRestrictionModal');
+            var toastEl = document.getElementById('liveToast');
+            var toastBody = document.getElementById('toastMessage');
+            var modalMsg = document.getElementById('modalActionMessage');
 
-    // Format rupiah
-    subtotalElement.textContent = 'Rp ' + subtotal.toLocaleString('id-ID');
-}
+            var guestModal = modalEl ? new bootstrap.Modal(modalEl) : null;
+            var toast = toastEl ? new bootstrap.Toast(toastEl) : null;
 
-// ===== KODE UTAMA (DOMContentLoaded) =====
-document.addEventListener('DOMContentLoaded', () => {
+            function showToast(message, type) {
+                if (!toast) return;
+                // Default type success
+                type = type || 'success';
 
-    // --- GUEST RESTRICTION MODAL ---
-    const showGuestRestrictionModal = (actionType, productId = null) => {
-        const actionText = actionType === 'wishlist'
-            ? 'menyimpan ke wishlist'
-            : 'menambahkan ke keranjang belanja';
+                toastBody.textContent = message;
+                toastEl.className = 'toast align-items-center text-white border-0 shadow';
 
-        document.getElementById('modalActionMessage').textContent =
-            `Untuk ${actionText}, silakan masuk ke akun Anda atau daftar baru.`;
+                if (type === 'success') toastEl.classList.add('bg-success');
+                else if (type === 'info') toastEl.classList.add('bg-info');
+                else toastEl.classList.add('bg-danger');
 
-        // Simpan intended action ke sessionStorage
-        sessionStorage.setItem('intendedAction', JSON.stringify({
-            type: actionType,
-            productId: productId,
-            timestamp: Date.now()
-        }));
+                toast.show();
+            }
 
-        const guestModal = new bootstrap.Modal(document.getElementById('guestRestrictionModal'));
-        guestModal.show();
-    };
+            // Fungsi Utama Request
+            async function sendRequest(button, isBuyNow) {
+                isBuyNow = isBuyNow || false;
 
-    // --- CHECK INTENDED ACTION (setelah login/register) ---
-    const checkIntendedAction = () => {
-        const savedAction = sessionStorage.getItem('intendedAction');
-        if (savedAction) {
-            const action = JSON.parse(savedAction);
+                // Ambil data dari atribut tombol atau fallback ke variable global
+                var url = button.dataset.url || cartUrl;
+                var action = button.dataset.action || "Keranjang";
+                var productId = button.dataset.productId || defaultProductId;
 
-            // Execute action hanya jika user sudah login DAN belum expired (5 menit)
-            if (window.IS_LOGGED_IN && (Date.now() - action.timestamp < 300000)) {
-                if (action.type === 'wishlist') {
-                    addToWishlist(action.productId);
-                } else if (action.type === 'cart') {
-                    // Auto submit form jika action adalah cart
-                    document.getElementById('cartForm')?.submit();
+                var qtyInput = document.getElementById('qtyInput');
+                var quantity = parseInt(qtyInput ? qtyInput.value : 1);
+
+                // Cek Stok lagi sebelum kirim (Client Side Check)
+                if (maxStock <= 0) {
+                    alert('Stok habis!');
+                    return;
+                }
+
+                // Cek Global variable login dari main.blade.php
+                if (typeof window.IS_LOGGED_IN !== 'undefined' && !window.IS_LOGGED_IN) {
+                    if (modalMsg) modalMsg.textContent = 'Login dulu untuk ' + (isBuyNow ? 'membeli produk' :
+                        'akses ' + action) + '.';
+                    if (guestModal) guestModal.show();
+                    return;
+                }
+
+                // Loading UI
+                var originalHTML = button.innerHTML;
+                button.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"></div>';
+                button.disabled = true;
+
+                // Ambil CSRF
+                var csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+                var csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : '';
+
+                try {
+                    var response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            product_id: productId,
+                            quantity: quantity
+                        })
+                    });
+
+                    // Cek status HTTP
+                    if (!response.ok) {
+                        // Coba baca error JSON dengan aman
+                        var errorData = await response.json().catch(function() {
+                            return {};
+                        });
+                        throw new Error(errorData.message || 'Server Error: ' + response.status);
+                    }
+
+                    var data = await response.json();
+
+                    // Handle Sukses
+                    if (data.status === 'success') {
+
+                        if (isBuyNow) {
+                            window.location.href = "{{ route('cart.index') }}";
+                            return;
+                        }
+
+                        if (action === 'Wishlist') {
+                            var icon = button.querySelector('i');
+                            if (icon) icon.className = 'bi bi-heart-fill';
+                            button.classList.remove('text-success');
+                            button.classList.add('text-danger');
+
+                            button.style.transform = 'scale(1.2)';
+                            setTimeout(function() {
+                                button.style.transform = 'scale(1)';
+                            }, 200);
+                        }
+                        showToast(data.message, 'success');
+
+                    } else if (data.status === 'info') {
+                        // Info (misal: sudah ada di wishlist)
+                        if (action === 'Wishlist') {
+                            var icon = button.querySelector('i');
+                            if (icon) icon.className = 'bi bi-heart-fill';
+                            button.classList.remove('text-success');
+                            button.classList.add('text-danger');
+                        }
+                        showToast(data.message, 'info');
+                    } else {
+                        throw new Error(data.message || 'Terjadi kesalahan');
+                    }
+
+                } catch (error) {
+                    console.error(error);
+                    showToast("Gagal memproses: " + error.message, 'error');
+                } finally {
+                    // Reset tombol jika tidak redirect
+                    if (!isBuyNow) {
+                        setTimeout(function() {
+                            button.disabled = false;
+                            // Jika bukan wishlist, kembalikan teks/icon awal
+                            if (action !== 'Wishlist') {
+                                button.innerHTML = originalHTML;
+                            } else {
+                                // Jika wishlist, pertahankan icon hati
+                                var isLiked = button.classList.contains('text-danger');
+                                // Pastikan struktur HTML icon valid
+                                button.innerHTML = '<i class="bi ' + (isLiked ? 'bi-heart-fill' :
+                                    'bi-heart') + '"></i>';
+                            }
+                        }, 500);
+                    }
                 }
             }
 
-            // Clear saved action
-            sessionStorage.removeItem('intendedAction');
-        }
-    };
+            // Event Listener Tombol Biasa
+            var actionBtns = document.querySelectorAll('.action-btn');
+            actionBtns.forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    sendRequest(this, false);
+                });
+            });
 
-    // Check intended action on page load
-    checkIntendedAction();
-
-    // --- WISHLIST HANDLER ---
-    document.querySelectorAll('.wishlist-btn').forEach(btn => {
-        btn.addEventListener('click', function (e) {
-            e.preventDefault();
-            const productId = this.getAttribute('data-product-id');
-
-            // Guest restriction
-            if (!window.IS_LOGGED_IN) {
-                showGuestRestrictionModal('wishlist', productId);
-                return;
-            }
-
-            // Logged-in user logic
-            const icon = this.querySelector('i');
-            const isFilled = icon.classList.contains('bi-heart-fill');
-
-            icon.classList.toggle('bi-heart');
-            icon.classList.toggle('bi-heart-fill');
-
-            if (isFilled) {
-                icon.style.color = '#3b7d5e';
-                removeFromWishlist(productId);
-            } else {
-                icon.style.color = '#dc3545';
-                addToWishlist(productId);
+            // Event Listener Tombol Beli
+            var buyNowBtn = document.getElementById('buyNowBtn');
+            if (buyNowBtn) {
+                buyNowBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    sendRequest(this, true);
+                });
             }
         });
-    });
-
-    // --- CART FORM HANDLER ---
-    const cartForm = document.getElementById('cartForm');
-    if (cartForm) {
-        cartForm.addEventListener('submit', function(e) {
-            // Guest restriction
-            if (!window.IS_LOGGED_IN) {
-                e.preventDefault();
-                const productId = cartForm.querySelector('input[name="product_id"]').value;
-                showGuestRestrictionModal('cart', productId);
-            }
-            // Jika logged in, form akan submit normal
-        });
-    }
-
-    // --- WISHLIST AJAX FUNCTIONS ---
-    function addToWishlist(productId) {
-        fetch(`/wishlist/${productId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                console.log('Added to wishlist:', productId);
-                // Bisa tambahkan toast notification di sini
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    }
-
-    function removeFromWishlist(productId) {
-        fetch(`/wishlist/${productId}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                console.log('Removed from wishlist:', productId);
-                // Bisa tambahkan toast notification di sini
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    }
-});
-</script>
-
-<!-- Font Awesome & Bootstrap Icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    </script>
 @endpush

@@ -2,17 +2,43 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 class HomeController extends Controller
 {
-    public function index() {
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        // $this->middleware('auth');
+    }
+
+    /**
+     * Show the application dashboard.
+     *
+     * @return \Illuminate\Contracts\Support\Renderable|\Illuminate\Http\RedirectResponse
+     */
+    public function index()
+    {
+        if (Auth::check()) {
+            if (Auth::user()->role == 'admin') {
+                return redirect()->route('admin.dashboard');
+            }
+        }
         return view('home');
     }
 
-    public function about() {
+    public function about()
+    {
         return view('about');
     }
 
-    public function contact() {
+    public function contact()
+    {
         return view('contact');
     }
 }
